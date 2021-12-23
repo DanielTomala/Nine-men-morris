@@ -1,5 +1,5 @@
 from .board import Board
-from .enums import Player, Position, PositionSquare
+from .enums import Player, Position as pos, PositionSquare as pos_sq
 from itertools import cycle
 from .pawn import Pawn
 
@@ -18,59 +18,34 @@ def print_board():
     board = Board()
     board.fields()[0].set_current_pawn(Pawn(player=Player.FIRST))
     board.fields()[1].set_current_pawn(Pawn(player=Player.SECOND))
-    playerDic = {Player.FIRST: "X", Player.SECOND: "Y"}
-    printDic = {PositionSquare.OUTER: print_outer,
-                PositionSquare.MIDDLE: print_middle, PositionSquare.INNER: print_inner}
-    printDic2 = {(PositionSquare.OUTER, Position.LEFT): "",
-                 (PositionSquare.OUTER, Position.CENTER): 14*"-",
-                 (PositionSquare.OUTER, Position.RIGHT): 14*"-",
-                 (PositionSquare.MIDDLE, Position.LEFT): "|" + 4*" ",
-                 (PositionSquare.MIDDLE, Position.CENTER):  9*"-",
-                 (PositionSquare.MIDDLE, Position.RIGHT): 9*"-",
-                 (PositionSquare.INNER, Position.LEFT): "|" + 4*" " + "|" + 4*" ",
-                 (PositionSquare.INNER, Position.CENTER): 4*"-",
-                 (PositionSquare.INNER, Position.RIGHT): 4*"-"}
-    printDic3 = {PositionSquare.OUTER: "",
-                 PositionSquare.MIDDLE: 4*" " + "|",
-                 PositionSquare.INNER: 2*(4*" " + "|")}
-    string = ""
-    for positionSquare in [PositionSquare.OUTER, PositionSquare.MIDDLE, PositionSquare.INNER]:
-        for position in [Position.LEFT, Position.CENTER, Position.RIGHT]:
-            field = board.find_field_with_given_positions(
-                positionSquare, Position.TOP, position)
-            # Print will difer if field will be empty or there will be different pawns
-            string += printDic2[(positionSquare, position)]
-            string += playerDic[field.currentPawn().player()
-                                ] if field and field.currentPawn() else "o"
-        string += printDic3[positionSquare]
-        string += "\n"
-        string += printDic[positionSquare]()
-        string += "\n"
+    player_symbols = {Player.FIRST: "X", Player.SECOND: "Y"}
+    print_dic = {pos_sq.OUTER: print_outer,
+                 pos_sq.MIDDLE: print_middle,
+                 pos_sq.INNER: print_inner}
+    print_dic_2 = {pos_sq.OUTER: {pos.LEFT: "",
+                                  pos.CENTER: 14*"-",
+                                  pos.RIGHT: 14*"-"},
+                   pos_sq.MIDDLE: {pos.LEFT: "|" + 4*" ",
+                                   pos.CENTER:  9*"-",
+                                   pos.RIGHT: 9*"-"},
+                   pos_sq.INNER: {pos.LEFT: "|" + 4*" " + "|" + 4*" ",
+                                  pos.CENTER: 4*"-",
+                                  pos.RIGHT: 4*"-"}}
+    print_dic_3 = {pos_sq.OUTER: "",
+                   pos_sq.MIDDLE: 4*" " + "|",
+                   pos_sq.INNER: 2*(4*" " + "|")}
+    board_str = ""
+    # TOP
+    board_str += get_top_or_bottom_part_of_board(board, pos.TOP, print_dic,
+                                                 print_dic_2, print_dic_3, player_symbols)
     # MIDDLE
-    for position in [Position.LEFT,  Position.RIGHT]:
-        for positionSquare in [PositionSquare.OUTER, PositionSquare.MIDDLE, PositionSquare.INNER]:
-            field = board.find_field_with_given_positions(
-                positionSquare, Position.MIDDLE, position)
-            string += playerDic[field.currentPawn().player()
-                                ] if field and field.currentPawn() else "o"
-            string += 4*"-" if positionSquare == PositionSquare.OUTER or positionSquare == PositionSquare.MIDDLE else ""
-        string += 9 * " "
-    string += "\n"
+    board_str += get_middle_part_of_board(board, player_symbols)
     # BOTTOM
-    for positionSquare in [PositionSquare.INNER, PositionSquare.MIDDLE, PositionSquare.OUTER]:
-        string += printDic[positionSquare]()
-        string += "\n"
-        for position in [Position.LEFT, Position.CENTER, Position.RIGHT]:
-            field = board.find_field_with_given_positions(
-                positionSquare, Position.BOTTOM, position)
-            # Print will difer if field will be empty or there will be different pawns
-            string += printDic2[(positionSquare, position)]
-            string += playerDic[field.currentPawn().player()
-                                ] if field and field.currentPawn() else "o"
-        string += printDic3[positionSquare]
-        string += "\n"
+    board_str += get_top_or_bottom_part_of_board(board, pos.BOTTOM, print_dic,
+                                                 print_dic_2, print_dic_3, player_symbols)
 
-    print(string)
+    print(board_str)
+
 
 # OUTER -> TOP -> LEFT CENTER RIGHT
 # MIDDLE -> TOP -> LEFT CENTER RIGHT
@@ -79,6 +54,44 @@ def print_board():
 # INNER -> BOTTOM -> LEFT CENTER RIGHT
 # MIDDLE -> BOTTOM -> LEFT CENTER RIGHT
 # OUTTER -> BOTTOM -> LEFT CENTER RIGHT
+def get_middle_part_of_board(board, player_symbols):
+    board_str = ""
+    for position in [pos.LEFT,  pos.RIGHT]:
+        for position_square in [pos_sq.OUTER, pos_sq.MIDDLE, pos_sq.INNER]:
+            field = board.find_field_with_given_positions(
+                position_square, pos.MIDDLE, position)
+            board_str += player_symbols[field.currentPawn().player()
+                                        ] if field and field.currentPawn() else "o"
+            board_str += 4 * \
+                "-" if position_square in [pos_sq.OUTER,
+                                           pos_sq.MIDDLE] else ""
+        board_str += 9 * " "
+    board_str += "\n"
+    return board_str
+
+
+def get_top_or_bottom_part_of_board(board, position_given, print_dic, print_dic_2, print_dic_3, player_symbols):
+    string = ""
+    positions_list = [pos_sq.OUTER, pos_sq.MIDDLE, pos_sq.INNER]
+    if position_given == pos.BOTTOM:
+        positions_list.reverse()
+    for position_square in positions_list:
+        if position_given == pos.BOTTOM:
+            string += print_dic[position_square]()
+            string += "\n"
+        for position in [pos.LEFT, pos.CENTER, pos.RIGHT]:
+            field = board.find_field_with_given_positions(
+                position_square, position_given, position)
+            # Print will difer if field will be empty or there will be different pawns
+            string += print_dic_2[position_square][position]
+            string += player_symbols[field.currentPawn().player()
+                                     ] if field and field.currentPawn() else "o"
+        string += print_dic_3[position_square]
+        string += "\n"
+        if position_given == pos.TOP:
+            string += print_dic[position_square]()
+            string += "\n"
+    return string
 
 
 def print_outer():
