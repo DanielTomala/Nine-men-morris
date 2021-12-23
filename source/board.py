@@ -1,6 +1,6 @@
 from typing import List
 from .coordinates import Coordinates
-from .enums import BoardSize, Position, PositionSquare
+from .enums import BoardSize, Player, Position, PositionSquare
 from .field import Field
 from .pawn import Pawn
 
@@ -20,17 +20,14 @@ class Board:
     After pawn is added, it is checked if mill occured
     """
 
-    def add_pawn(self, field: Field, pawn: Pawn):
-        if not field.currentPawn():
-            field.set_current_pawn(pawn)
-            field.set_is_occupied(True)
-            pawn.set_current_field(field)
+    def add_pawn(self, field: Field, player: Player):
+        if field.player() is None:
+            field.set_player(player)
         self.check_mill()
 
     def remove_pawn(self, field: Field):
-        if field.currentPawn():
-            field.set_current_pawn(None)
-            field.set_is_occupied(False)
+        if field.player():
+            field.set_player(None)
 
     """
     Checks if last move created a mill
@@ -44,13 +41,10 @@ class Board:
     """
     # Check if new field has connection with previous one
 
-    def move_pawn(self, newField: Field, pawn: Pawn):
-        if not newField.isOccupied() and newField in pawn.current_field().connections():
-            pawn.current_field().set_is_occupied(False)
-            pawn.current_field().set_current_pawn(None)
-            pawn.set_current_field(newField)
-            newField.set_current_pawn(pawn)
-            newField.set_is_occupied(True)
+    def move_pawn(self, current_field: Field, new_field: Field, player: Player):
+        if new_field.player() is None and new_field in current_field.connections():
+            current_field.set_player(None)
+            new_field.set_player(player)
         self.check_mill()
 
     def find_field_with_given_positions(self, positionSquare: PositionSquare, positionTMB: Position, positionLCR: Position) -> Field:

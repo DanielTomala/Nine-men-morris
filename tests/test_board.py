@@ -1,80 +1,63 @@
-from ..source.pawn import Pawn
-from ..source.enums import Position, PositionSquare
+from ..source.enums import Player, Position, PositionSquare
 from ..source.board import Board
 
 
 def test_add_pawn():
     board = Board()
-    pawn = Pawn()
     field = board.fields()[0]
-    board.add_pawn(field, pawn)
-    assert field.currentPawn() == pawn
-    assert field.isOccupied()
-    assert pawn.current_field() == field
+    board.add_pawn(field, Player.FIRST)
+    assert field.player() == Player.FIRST
 
 
-def test_add_pawn_occupied():
+def test_add_pawn_field_already_occupied():
     board = Board()
-    pawn = Pawn()
-    pawn1 = Pawn()
     field = board.fields()[0]
-    board.add_pawn(field, pawn1)
-    board.add_pawn(field, pawn)
-    assert field.currentPawn() == pawn1
-    assert field.isOccupied()
-    assert pawn.current_field() == None
-    assert pawn1.current_field() == field
+    board.add_pawn(field, Player.FIRST)
+    board.add_pawn(field, Player.SECOND)
+    assert field.player() == Player.FIRST
 
 
 def test_remove_pawn():
     board = Board()
-    pawn = Pawn()
     field = board.fields()[0]
-    board.add_pawn(field, pawn)
-    assert field.currentPawn() == pawn
+    board.add_pawn(field, Player.FIRST)
+    assert field.player() == Player.FIRST
     board.remove_pawn(field)
-    assert field.currentPawn() == None
-    assert not field.isOccupied()
+    assert field.player() is None
 
 
 def test_move_pawn():
     board = Board()
-    pawn = Pawn()
     field1 = board.fields()[0]
     field2 = board.fields()[1]
-    board.add_pawn(field1, pawn)
-    assert field1.currentPawn() == pawn
-    board.move_pawn(field2, pawn)
-    assert field1.currentPawn() == None
-    assert not field1.isOccupied()
-    assert field2.currentPawn() == pawn
-    assert field2.isOccupied()
+    board.add_pawn(field1, Player.FIRST)
+    assert field1.player() == Player.FIRST
+    board.move_pawn(field1, field2, Player.FIRST)
+    assert field1.player() is None
+    assert field2.player() == Player.FIRST
 
 
 def test_move_pawn_field_occupied():
     board = Board()
-    pawn1 = Pawn()
-    pawn2 = Pawn()
     field1 = board.fields()[0]
     field2 = board.fields()[1]
-    board.add_pawn(field1, pawn1)
-    board.add_pawn(field2, pawn2)
-    assert field1.currentPawn() == pawn1
-    assert field2.currentPawn() == pawn2
-    board.move_pawn(field2, pawn1)
-    assert field1.currentPawn() == pawn1
-    assert field2.currentPawn() == pawn2
+    board.add_pawn(field1, Player.FIRST)
+    board.add_pawn(field2, Player.SECOND)
+    assert field1.player() == Player.FIRST
+    assert field2.player() == Player.SECOND
+    board.move_pawn(field1, field2, Player.FIRST)
+    assert field1.player() == Player.FIRST
+    assert field2.player() == Player.SECOND
 
 
 def test_move_pawn_no_connection():
     board = Board()
-    pawn = Pawn()
     field1 = board.fields()[0]
     field2 = board.fields()[2]
-    board.add_pawn(field1, pawn)
-    assert field1.currentPawn() == pawn
-    board.move_pawn(field2, pawn)
-    assert field1.currentPawn() == pawn
+    board.add_pawn(field1, Player.FIRST)
+    assert field1.player() == Player.FIRST
+    board.move_pawn(field1, field2, Player.FIRST)
+    assert field1.player() == Player.FIRST
 
 
 def test_find_field_with_given_positions():
