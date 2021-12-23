@@ -1,15 +1,15 @@
 from typing import List
-from source.coordinates import Coordinates
-import source.pawn
-
+from .coordinates import Coordinates
+from . import pawn
 
 
 class Field:
-    def __init__(self, coordinates: "Coordinates", connections: List["Field"] = None, isOccupied: bool = False, currentPawn: source.pawn.Pawn = None) -> None:
+    def __init__(self, coordinates: "Coordinates", connections: List["Field"] = None, isOccupied: bool = False, currentPawn: "pawn.Pawn" = None) -> None:
         self._coordiantes = coordinates
         self._connections = connections
         self._isOccupied = isOccupied
         self._currentPawn = currentPawn
+        #self._player = player ???
 
     def coordiantes(self):
         return self._coordiantes

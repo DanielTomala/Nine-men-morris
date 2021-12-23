@@ -1,6 +1,7 @@
-from board import Board
-from enums import Position, PositionSquare
+from .board import Board
+from .enums import Player, Position, PositionSquare
 from itertools import cycle
+from .pawn import Pawn
 
 
 def main():
@@ -15,6 +16,9 @@ def choose_mode():
 
 def print_board():
     board = Board()
+    board.fields()[0].set_current_pawn(Pawn(player=Player.FIRST))
+    board.fields()[1].set_current_pawn(Pawn(player=Player.SECOND))
+    playerDic = {Player.FIRST: "X", Player.SECOND: "Y"}
     printDic = {PositionSquare.OUTER: print_outer,
                 PositionSquare.MIDDLE: print_middle, PositionSquare.INNER: print_inner}
     printDic2 = {(PositionSquare.OUTER, Position.LEFT): "",
@@ -36,7 +40,8 @@ def print_board():
                 positionSquare, Position.TOP, position)
             # Print will difer if field will be empty or there will be different pawns
             string += printDic2[(positionSquare, position)]
-            string += "o"
+            string += playerDic[field.currentPawn().player()
+                                ] if field and field.currentPawn() else "o"
         string += printDic3[positionSquare]
         string += "\n"
         string += printDic[positionSquare]()
@@ -46,7 +51,8 @@ def print_board():
         for positionSquare in [PositionSquare.OUTER, PositionSquare.MIDDLE, PositionSquare.INNER]:
             field = board.find_field_with_given_positions(
                 positionSquare, Position.MIDDLE, position)
-            string += "o"
+            string += playerDic[field.currentPawn().player()
+                                ] if field and field.currentPawn() else "o"
             string += 4*"-" if positionSquare == PositionSquare.OUTER or positionSquare == PositionSquare.MIDDLE else ""
         string += 9 * " "
     string += "\n"
@@ -56,10 +62,11 @@ def print_board():
         string += "\n"
         for position in [Position.LEFT, Position.CENTER, Position.RIGHT]:
             field = board.find_field_with_given_positions(
-                positionSquare, Position.TOP, position)
+                positionSquare, Position.BOTTOM, position)
             # Print will difer if field will be empty or there will be different pawns
             string += printDic2[(positionSquare, position)]
-            string += "o"
+            string += playerDic[field.currentPawn().player()
+                                ] if field and field.currentPawn() else "o"
         string += printDic3[positionSquare]
         string += "\n"
 
@@ -92,7 +99,3 @@ def print_welcome():
 
 def print_choose_mode():
     pass
-
-
-if __name__ == "__main__":
-    main()

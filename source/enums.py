@@ -27,3 +27,8 @@ class Position(Enum):
     LEFT = 4
     CENTER = 5
     RIGHT = 6
+
+
+class Player(Enum):
+    FIRST = 1
+    SECOND = 2
