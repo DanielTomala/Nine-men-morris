@@ -1,5 +1,6 @@
-from source.board import Board
-from source.pawn import Pawn
+from ..source.pawn import Pawn
+from ..source.enums import Position, PositionSquare
+from ..source.board import Board
 
 
 def test_add_pawn():
@@ -10,6 +11,19 @@ def test_add_pawn():
     assert field.currentPawn() == pawn
     assert field.isOccupied()
     assert pawn.current_field() == field
+
+
+def test_add_pawn_occupied():
+    board = Board()
+    pawn = Pawn()
+    pawn1 = Pawn()
+    field = board.fields()[0]
+    board.add_pawn(field, pawn1)
+    board.add_pawn(field, pawn)
+    assert field.currentPawn() == pawn1
+    assert field.isOccupied()
+    assert pawn.current_field() == None
+    assert pawn1.current_field() == field
 
 
 def test_remove_pawn():
@@ -61,3 +75,10 @@ def test_move_pawn_no_connection():
     assert field1.currentPawn() == pawn
     board.move_pawn(field2, pawn)
     assert field1.currentPawn() == pawn
+
+
+def test_find_field_with_given_positions():
+    board = Board()
+    field = board.find_field_with_given_positions(
+        PositionSquare.INNER, Position.TOP, Position.LEFT)
+    assert field == board.fields()[0]
