@@ -60,6 +60,17 @@ def test_move_pawn_no_connection():
     assert field1.player() == Player.FIRST
 
 
+def test_players_pawns_number():
+    board = Board()
+    field1 = board.fields()[0]
+    field2 = board.fields()[1]
+    field3 = board.fields()[5]
+    field1.set_player(Player.FIRST)
+    field2.set_player(Player.SECOND)
+    field3.set_player(Player.FIRST)
+    assert board.players_pawns_number() == (2, 1)
+
+
 def test_find_field_with_given_positions():
     board = Board()
     field = board.find_field_with_given_positions(

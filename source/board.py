@@ -2,7 +2,6 @@ from typing import List
 from .coordinates import Coordinates
 from .enums import BoardSize, Player, Position, PositionSquare
 from .field import Field
-from .pawn import Pawn
 
 
 class Board:
@@ -50,6 +49,22 @@ class Board:
     def find_field_with_given_positions(self, positionSquare: PositionSquare, positionTMB: Position, positionLCR: Position) -> Field:
         for field in self._fields:
             if field.coordiantes().get_coordinates() == (positionSquare, positionTMB, positionLCR):
+                return field
+
+    def players_pawns_number(self):
+        player_1_pawns_no = 0
+        player_2_pawns_no = 0
+        for field in self._fields:
+            if field.player() == Player.FIRST:
+                player_1_pawns_no += 1
+            elif field.player() == Player.SECOND:
+                player_2_pawns_no += 1
+        return (player_1_pawns_no, player_2_pawns_no)
+
+    # ADD TESTS
+    def get_field_by_id(self, id) -> Field:
+        for field in self._fields:
+            if field.id() == id:
                 return field
 
     def create_nine_pawns_board() -> List[Field]:
