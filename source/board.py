@@ -15,8 +15,8 @@ class Board:
     def fields(self):
         return self._fields
 
-    def size(self):
-        return self._size
+    def pawns_number(self):
+        return self._pawns_number
 
     """
     After pawn is added, it is checked if mill occured
@@ -55,15 +55,12 @@ class Board:
             if field.coordiantes().get_all_coordinates() == (positionSquare, positionTMB, positionLCR):
                 return field
 
-    def players_pawns_number(self):
-        player_1_pawns_no = 0
-        player_2_pawns_no = 0
+    def player_pawns_number(self, player):
+        player_pawns_no = 0
         for field in self._fields:
-            if field.player() == Player.FIRST:
-                player_1_pawns_no += 1
-            elif field.player() == Player.SECOND:
-                player_2_pawns_no += 1
-        return (player_1_pawns_no, player_2_pawns_no)
+            if field.player() == player:
+                player_pawns_no += 1
+        return player_pawns_no
 
     def get_field_by_id(self, id) -> Field:
         for field in self._fields:

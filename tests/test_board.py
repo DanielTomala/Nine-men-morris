@@ -68,7 +68,7 @@ def test_players_pawns_number():
     field1.set_player(Player.FIRST)
     field2.set_player(Player.SECOND)
     field3.set_player(Player.FIRST)
-    assert board.players_pawns_number() == (2, 1)
+    assert board.player_pawns_number() == (2, 1)
 
 
 def test_find_field_with_given_positions():
