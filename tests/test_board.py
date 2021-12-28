@@ -1,5 +1,5 @@
 from ..source.enums import Player, Position, PositionSquare
-from ..source.board import Board
+from ..source.board import Board, FIELD_IDS
 
 
 def test_add_pawn():
@@ -74,5 +74,91 @@ def test_players_pawns_number():
 def test_find_field_with_given_positions():
     board = Board()
     field = board.find_field_with_given_positions(
-        PositionSquare.INNER, Position.TOP, Position.LEFT)
+        PositionSquare.OUTER, Position.TOP, Position.LEFT)
     assert field == board.fields()[0]
+
+
+def test_create_nine_pawns_board():
+    board = Board()
+    board_fields = board._create_nine_pawns_board()
+    assert board_fields[0].id() == FIELD_IDS[0]
+    assert board_fields[0].coordiantes().square() == PositionSquare.OUTER
+    assert board_fields[0].coordiantes(
+    ).position_top_middle_bottom() == Position.TOP
+    assert board_fields[0].coordiantes(
+    ).position_left_center_right() == Position.LEFT
+
+    assert board_fields[5].id() == FIELD_IDS[5]
+    assert board_fields[5].coordiantes().square() == PositionSquare.MIDDLE
+    assert board_fields[5].coordiantes(
+    ).position_top_middle_bottom() == Position.TOP
+    assert board_fields[5].coordiantes(
+    ).position_left_center_right() == Position.RIGHT
+
+    assert board_fields[11].id() == FIELD_IDS[11]
+    assert board_fields[11].coordiantes().square() == PositionSquare.INNER
+    assert board_fields[11].coordiantes(
+    ).position_top_middle_bottom() == Position.MIDDLE
+    assert board_fields[11].coordiantes(
+    ).position_left_center_right() == Position.LEFT
+
+    assert board_fields[12].id() == FIELD_IDS[12]
+    assert board_fields[12].coordiantes().square() == PositionSquare.INNER
+    assert board_fields[12].coordiantes(
+    ).position_top_middle_bottom() == Position.MIDDLE
+    assert board_fields[12].coordiantes(
+    ).position_left_center_right() == Position.RIGHT
+
+    assert board_fields[18].id() == FIELD_IDS[18]
+    assert board_fields[18].coordiantes().square() == PositionSquare.MIDDLE
+    assert board_fields[18].coordiantes(
+    ).position_top_middle_bottom() == Position.BOTTOM
+    assert board_fields[18].coordiantes(
+    ).position_left_center_right() == Position.LEFT
+
+
+def test_get_field_by_id():
+    board = Board()
+    field1 = board.get_field_by_id("A")
+    field2 = board.get_field_by_id("Z")
+    field3 = board.get_field_by_id("L")
+    field4 = board.get_field_by_id("T")
+    assert field1 == board.fields()[0]
+    assert field2 == board.fields()[-1]
+    assert field3 == board.fields()[11]
+    assert field4 == board.fields()[18]
+
+
+def test_check_is_connection_beetween_fields_nine_pawns():
+    board = Board()
+    field_A = board.get_field_by_id("A")
+    field_C = board.get_field_by_id("C")
+    field_D = board.get_field_by_id("D")
+    field_E = board.get_field_by_id("E")
+    field_H = board.get_field_by_id("H")
+    field_J = board.get_field_by_id("J")
+    field_L = board.get_field_by_id("L")
+    field_M = board.get_field_by_id("M")
+    field_N = board.get_field_by_id("N")
+    field_O = board.get_field_by_id("O")
+    field_R = board.get_field_by_id("R")
+    field_S = board.get_field_by_id("S")
+    field_Z = board.get_field_by_id("Z")
+    assert board.check_is_connection_beetween_fields_nine_pawns(field_A, field_J)
+    assert board.check_is_connection_beetween_fields_nine_pawns(field_J, field_A)
+    assert board.check_is_connection_beetween_fields_nine_pawns(field_D, field_E)
+    assert board.check_is_connection_beetween_fields_nine_pawns(field_H, field_E)
+    assert board.check_is_connection_beetween_fields_nine_pawns(field_N, field_M)
+    assert board.check_is_connection_beetween_fields_nine_pawns(field_O, field_C)
+    assert board.check_is_connection_beetween_fields_nine_pawns(field_O, field_N)
+    assert board.check_is_connection_beetween_fields_nine_pawns(field_S, field_M)
+    assert board.check_is_connection_beetween_fields_nine_pawns(field_Z, field_O)
+    assert not board.check_is_connection_beetween_fields_nine_pawns(field_A, field_C)
+    assert not board.check_is_connection_beetween_fields_nine_pawns(field_A, field_Z)
+    assert not board.check_is_connection_beetween_fields_nine_pawns(field_A, field_D)
+    assert not board.check_is_connection_beetween_fields_nine_pawns(field_D, field_H)
+    assert not board.check_is_connection_beetween_fields_nine_pawns(field_E, field_M)
+    assert not board.check_is_connection_beetween_fields_nine_pawns(field_R, field_E)
+    assert not board.check_is_connection_beetween_fields_nine_pawns(field_L, field_M)
+    assert not board.check_is_connection_beetween_fields_nine_pawns(field_M, field_O)
+    assert not board.check_is_connection_beetween_fields_nine_pawns(field_N, field_L)

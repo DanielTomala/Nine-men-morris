@@ -24,5 +24,5 @@ def test_getters():
 def test_get_coordinates():
     coordinates = Coordinates(PositionSquare.MIDDLE,
                               Position.TOP, Position.LEFT)
-    assert coordinates.get_coordinates() == (
+    assert coordinates.get_all_coordinates() == (
         PositionSquare.MIDDLE, Position.TOP, Position.LEFT)

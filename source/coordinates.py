@@ -22,5 +22,5 @@ class Coordinates:
     def position_left_center_right(self):
         return self._positionLeftCenterRight
 
-    def get_coordinates(self):
+    def get_all_coordinates(self):
         return (self._square, self._positionTopMiddleBottom, self._positionLeftCenterRight)

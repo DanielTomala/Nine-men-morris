@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class BoardSize(Enum):
+class PawnsNumber(Enum):
     NINE = 9
     THREE = 3
     SIX = 6
@@ -24,9 +24,9 @@ class Position(Enum):
     TOP = 1
     MIDDLE = 2
     BOTTOM = 3
-    LEFT = 4
-    CENTER = 5
-    RIGHT = 6
+    LEFT = 11
+    CENTER = 12
+    RIGHT = 13
 
 
 class Player(Enum):
