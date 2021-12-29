@@ -46,7 +46,7 @@ def set_pawn_by_player(board: Board, player: Player):
     # Zabezpiecznie przed nieoczekiwanym inputem, castowanie do upper case
     id = get_user_input("Where do you want to add your pawn: ")
     print()
-    field = board.get_field_by_id(id)
+    field = board.field_by_id(id)
     board.add_pawn(field, player)
 
 
