@@ -23,9 +23,8 @@ class Board:
     """
 
     def add_pawn(self, field: Field, player: Player):
-        if field.player() is None:
+        if self.is_field_free(field):
             field.set_player(player)
-            self.check_mill(field)
 
     def remove_pawn(self, field: Field):
         if field.player():
@@ -41,37 +40,10 @@ class Board:
         if new_field.player() is None and self.check_is_connection_beetween_fields_nine_pawns(current_field, new_field):
             current_field.set_player(None)
             new_field.set_player(player)
-        self.check_mill(new_field)
 
-    """
-    Checks if last move created a mill
-    """
-
-    def check_mill(self, field: Field):
-        if field.coordiantes().position_top_middle_bottom() == pos.MIDDLE or field.coordiantes().position_left_center_right() == pos.CENTER:
-            fields_to_check = []
-            for square in pos_sq:
-                found_field = self.field_by_positions(square, field.coordiantes(
-                ).position_top_middle_bottom(), field.coordiantes().position_left_center_right())
-                fields_to_check.append(found_field)
-                if all([field.player() == check_field.player() for check_field in fields_to_check]):
-                    return field.player()
-        if field.coordiantes().position_left_center_right() in [pos.LEFT, pos.RIGHT]:
-            fields_to_check=[]
-            for position in [pos.TOP, pos.MIDDLE, pos.BOTTOM]:
-                found_field=self.field_by_positions(field.coordiantes().square(
-                ), position, field.coordiantes().position_left_center_right())
-                fields_to_check.append(found_field)
-                if all([field.player() == check_field.player() for check_field in fields_to_check]):
-                    return field.player()
-        if field.coordiantes().position_top_middle_bottom() in [pos.TOP, pos.BOTTOM]:
-            fields_to_check=[]
-            for position in [pos.LEFT, pos.CENTER, pos.RIGHT]:
-                found_field=self.field_by_positions(field.coordiantes().square(
-                ), field.coordiantes().position_top_middle_bottom(), position)
-                fields_to_check.append(found_field)
-                if all([field.player() == check_field.player() for check_field in fields_to_check]):
-                    return field.player()
+    def is_field_free(self, field: Field) -> bool:
+        return_value = True if field.player() is None else False
+        return return_value
 
     def field_by_positions(self, positionSquare: pos_sq, positionTMB: pos, positionLCR: pos) -> Field:
         for field in self._fields:
@@ -79,7 +51,7 @@ class Board:
                 return field
 
     def player_pawns_number(self, player) -> int:
-        player_pawns_no=0
+        player_pawns_no = 0
         for field in self._fields:
             if field.player() == player:
                 player_pawns_no += 1
@@ -91,12 +63,12 @@ class Board:
                 return field
 
     def check_is_connection_beetween_fields_nine_pawns(self, current_field: Field, new_field: Field) -> bool:
-        current_position_tmb=current_field.coordiantes().position_top_middle_bottom()
-        current_position_lcr=current_field.coordiantes().position_left_center_right()
-        current_position_square=current_field.coordiantes().square()
-        new_position_tmb=new_field.coordiantes().position_top_middle_bottom()
-        new_position_lcr=new_field.coordiantes().position_left_center_right()
-        new_position_square=new_field.coordiantes().square()
+        current_position_tmb = current_field.coordiantes().position_top_middle_bottom()
+        current_position_lcr = current_field.coordiantes().position_left_center_right()
+        current_position_square = current_field.coordiantes().square()
+        new_position_tmb = new_field.coordiantes().position_top_middle_bottom()
+        new_position_lcr = new_field.coordiantes().position_left_center_right()
+        new_position_square = new_field.coordiantes().square()
 
         if current_position_square == new_position_square:
             if current_position_tmb == new_position_tmb:
@@ -119,8 +91,8 @@ class Board:
         return False
 
     def _create_nine_pawns_board(self) -> List[Field]:
-        fields_list=[]
-        id_index=0
+        fields_list = []
+        id_index = 0
         for square in pos_sq:
             for position_lcr in [pos.LEFT, pos.CENTER, pos.RIGHT]:
                 fields_list.append(Field(FIELD_IDS[id_index], Coordinates(
