@@ -11,12 +11,19 @@ class Board:
     def __init__(self, pawns_number: PawnsNumber = PawnsNumber.NINE) -> None:
         self._fields = self._create_nine_pawns_board()
         self._pawns_number = pawns_number
+        self._starting_player = None
 
     def fields(self):
         return self._fields
 
     def pawns_number(self):
         return self._pawns_number
+
+    def starting_player(self):
+        return self._starting_player
+
+    def set_starting_player(self, player: Player):
+        self._starting_player = player
 
     """
     After pawn is added, it is checked if mill occured

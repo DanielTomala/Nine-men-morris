@@ -5,9 +5,10 @@ from .enums import PawnsNumber, Player
 from .enums import Position as pos
 from .enums import PositionSquare as pos_sq
 from .field import Field
-from .interface import (OTHER_PLAYER, print_before_move, print_board, print_choose_mode,
-                        print_empty_lines, print_field_occupied,
-                        print_improper_id, print_mill_occurred, print_no_pawn,
+from .interface import (OTHER_PLAYER, print_before_move, print_board,
+                        print_choose_mode, print_empty_lines,
+                        print_field_occupied, print_improper_id,
+                        print_mill_occurred, print_no_pawn,
                         print_not_your_pawn, print_pawns_left,
                         print_starting_player,
                         print_transition_to_moving_phase, print_welcome)
@@ -29,10 +30,11 @@ def main():
 
 def start_game(board: Board):
     starting_player = get_starting_player()
+    board.set_starting_player(starting_player)
     print_starting_player(starting_player)
-    setting_pawns_phase(board, starting_player)
+    setting_pawns_phase(board)
     print_transition_to_moving_phase()
-    moving_pawns_phase(board, starting_player)
+    moving_pawns_phase(board)
 
 
 def get_starting_player():
@@ -44,25 +46,25 @@ def get_starting_player():
 # Dodać wyświetlanie pionków, które pozostały do umieszczenie i które zostały zbite
 
 
-def setting_pawns_phase(board: Board, starting_player) -> None:
+def setting_pawns_phase(board: Board) -> None:
     print_empty_lines(1)
     first_player_pawns_no = board.pawns_number().value
     second_player_pawns_no = board.pawns_number().value
     while first_player_pawns_no > 0 or second_player_pawns_no > 0:
-        set_pawn_by_player(board, starting_player)
+        set_pawn_by_player(board, board.starting_player())
         first_player_pawns_no -= 1
         print_board(board)
-        set_pawn_by_player(board, OTHER_PLAYER[starting_player])
+        set_pawn_by_player(board, OTHER_PLAYER[board.starting_player()])
         second_player_pawns_no -= 1
         print_board(board)
 
 
-def moving_pawns_phase(board: Board, starting_player: Player):
+def moving_pawns_phase(board: Board):
     print_empty_lines(1)
     while is_game_still_played(board):
-        move_pawn_by_player(board, starting_player)
+        move_pawn_by_player(board, board.starting_player())
         print_board(board)
-        move_pawn_by_player(board, OTHER_PLAYER[starting_player])
+        move_pawn_by_player(board, OTHER_PLAYER[board.starting_player()])
         print_board(board)
 
 # TODO
@@ -86,6 +88,7 @@ def set_pawn_by_player(board: Board, player: Player):
 
 
 def get_field_condition_field_is_free(board: Board, message: str) -> Field:
+    # Czy tu nie będzie nieskończonej pętli kiedyś?
     while True:
         id = get_user_input(message).upper()
         if id in FIELD_IDS:
