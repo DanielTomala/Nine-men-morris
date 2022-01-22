@@ -10,6 +10,7 @@ FIELD_IDS = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K",
 class Board:
     def __init__(self, pawns_number: PawnsNumber = PawnsNumber.NINE) -> None:
         self._fields = self._create_nine_pawns_board()
+        self._set_nine_pawns_connections()
         self._pawns_number = pawns_number
         self._starting_player = None
 
@@ -69,6 +70,13 @@ class Board:
             if field.id() == id:
                 return field
 
+    def get_all_player_fields(self, player: Player) -> List[Field]:
+        fields_to_return = []
+        for field in self._fields:
+            if field.player() == player:
+                fields_to_return.append(field)
+        return fields_to_return
+
     def check_is_connection_beetween_fields_nine_pawns(self, current_field: Field, new_field: Field) -> bool:
         current_position_tmb = current_field.coordiantes().position_top_middle_bottom()
         current_position_lcr = current_field.coordiantes().position_left_center_right()
@@ -120,19 +128,31 @@ class Board:
                 id_index += 1
         return fields_list
 
-    # o--------------o--------------o
-    # |              |              |
-    # |    o---------o---------o    |
-    # |    |         |         |    |
-    # |    |    o----o----o    |    |
-    # |    |    |         |    |    |
-    # o----o----o         o----o----o
-    # |    |    |         |    |    |
-    # |    |    o----o----o    |    |
-    # |    |         |         |    |
-    # |    o---------o---------o    |
-    # |              |              |
-    # o--------------o--------------o
+    def _set_nine_pawns_connections(self):
+        self.field_by_id("A").set_connections(["B", "J"])
+        self.field_by_id("B").set_connections(["A", "C", "E"])
+        self.field_by_id("C").set_connections(["B", "O"])
+        self.field_by_id("D").set_connections(["E", "K"])
+        self.field_by_id("E").set_connections(["B", "D", "F", "H"])
+        self.field_by_id("F").set_connections(["E", "N"])
+        self.field_by_id("G").set_connections(["H", "L"])
+        self.field_by_id("H").set_connections(["E", "G", "I"])
+        self.field_by_id("I").set_connections(["H", "M"])
+        self.field_by_id("J").set_connections(["A", "K", "X"])
+        self.field_by_id("K").set_connections(["D", "J", "L", "T"])
+        self.field_by_id("L").set_connections(["G", "K", "P"])
+        self.field_by_id("M").set_connections(["I", "N", "S"])
+        self.field_by_id("N").set_connections(["F", "M", "O", "W"])
+        self.field_by_id("O").set_connections(["C", "N", "Z"])
+        self.field_by_id("P").set_connections(["L", "R"])
+        self.field_by_id("R").set_connections(["P", "S", "U"])
+        self.field_by_id("S").set_connections(["M", "R"])
+        self.field_by_id("T").set_connections(["K", "U"])
+        self.field_by_id("U").set_connections(["R", "T", "W", "Y"])
+        self.field_by_id("W").set_connections(["N", "U"])
+        self.field_by_id("X").set_connections(["J", "Y"])
+        self.field_by_id("Y").set_connections(["U", "X", "Z"])
+        self.field_by_id("Z").set_connections(["O", "Y"])
 
     # A--------------B--------------C
     # |              |              |
@@ -147,3 +167,17 @@ class Board:
     # |    T---------U---------W    |
     # |              |              |
     # X--------------Y--------------Z
+
+    # o--------------o--------------o
+    # |              |              |
+    # |    o---------o---------o    |
+    # |    |         |         |    |
+    # |    |    o----o----o    |    |
+    # |    |    |         |    |    |
+    # o----o----o         o----o----o
+    # |    |    |         |    |    |
+    # |    |    o----o----o    |    |
+    # |    |         |         |    |
+    # |    o---------o---------o    |
+    # |              |              |
+    # o--------------o--------------o

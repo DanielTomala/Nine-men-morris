@@ -1,3 +1,4 @@
+from typing import List
 from .enums import Player
 from .coordinates import Coordinates
 
@@ -8,6 +9,7 @@ class Field:
         self._id = id
         self._coordiantes = coordinates
         self._player = player
+        self._connections = None
 
     def id(self):
         return self._id
@@ -20,3 +22,9 @@ class Field:
 
     def set_player(self, player: Player):
         self._player = player
+
+    def connections(self):
+        return self._connections
+
+    def set_connections(self, fields_ids: List[str]):
+        self._connections = fields_ids
