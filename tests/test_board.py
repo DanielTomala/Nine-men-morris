@@ -1,4 +1,4 @@
-from ..source.enums import PawnsNumber, Player, Position, PositionSquare
+from ..source.enums import Player, Position, PositionSquare
 from ..source.board import Board, FIELD_IDS
 
 
@@ -72,7 +72,7 @@ def test_players_pawns_number():
     assert board.player_pawns_number(Player.SECOND) == 1
 
 
-def test_field_by_given_positions():
+def test_field_by_positions():
     board = Board()
     field = board.field_by_positions(
         PositionSquare.OUTER, Position.TOP, Position.LEFT)
@@ -181,3 +181,54 @@ def test_check_is_connection_beetween_fields_nine_pawns():
         field_M, field_O)
     assert not board.check_is_connection_beetween_fields_nine_pawns(
         field_N, field_L)
+
+
+def test_is_field_free():
+    board = Board()
+    field_A = board.field_by_id("A")
+    field_A.set_player(Player.FIRST)
+    field_R = board.field_by_id("R")
+    field_R.set_player(Player.SECOND)
+    assert not board.is_field_free(field_A)
+    assert not board.is_field_free(field_R)
+    assert board.is_field_free(board.field_by_id("B"))
+    assert board.is_field_free(board.field_by_id("Z"))
+    assert board.is_field_free(board.field_by_id("T"))
+
+    board.remove_pawn(field_A)
+    board.remove_pawn(field_R)
+    assert board.is_field_free(field_A)
+    assert board.is_field_free(field_R)
+
+
+def test_get_all_player_fields():
+    board = Board()
+    assert board.get_all_player_fields(Player.FIRST) == []
+    assert board.get_all_player_fields(Player.SECOND) == []
+    field_A = board.field_by_id("A")
+    field_A.set_player(Player.FIRST)
+    field_B = board.field_by_id("B")
+    field_B.set_player(Player.FIRST)
+    field_J = board.field_by_id("J")
+    field_J.set_player(Player.FIRST)
+    field_P = board.field_by_id("P")
+    field_P.set_player(Player.FIRST)
+    field_R = board.field_by_id("R")
+    field_R.set_player(Player.FIRST)
+    field_Y = board.field_by_id("Y")
+    field_Y.set_player(Player.FIRST)
+
+    assert board.get_all_player_fields(Player.FIRST) == [
+        field_A, field_B, field_J, field_P, field_R, field_Y]
+
+    field_C = board.field_by_id("C")
+    field_C.set_player(Player.SECOND)
+    field_D = board.field_by_id("D")
+    field_D.set_player(Player.SECOND)
+    field_U = board.field_by_id("U")
+    field_U.set_player(Player.SECOND)
+    field_Z = board.field_by_id("Z")
+    field_Z.set_player(Player.SECOND)
+
+    assert board.get_all_player_fields(Player.SECOND) == [
+        field_C, field_D, field_U, field_Z]

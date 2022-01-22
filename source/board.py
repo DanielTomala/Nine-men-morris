@@ -30,11 +30,11 @@ class Board:
     After pawn is added, it is checked if mill occured
     """
 
-    def add_pawn(self, field: Field, player: Player):
+    def add_pawn(self, field: Field, player: Player) -> None:
         if self.is_field_free(field):
             field.set_player(player)
 
-    def remove_pawn(self, field: Field):
+    def remove_pawn(self, field: Field) -> None:
         if field.player():
             field.set_player(None)
 
@@ -44,7 +44,7 @@ class Board:
     # Check if new field has connection with previous one
     # TODO check connections
 
-    def move_pawn(self, current_field: Field, new_field: Field, player: Player):
+    def move_pawn(self, current_field: Field, new_field: Field, player: Player) -> None:
         if new_field.player() is None and self.check_is_connection_beetween_fields_nine_pawns(current_field, new_field):
             current_field.set_player(None)
             new_field.set_player(player)
@@ -66,6 +66,7 @@ class Board:
         return player_pawns_no
 
     def field_by_id(self, id) -> Field:
+        id = id.upper()
         for field in self._fields:
             if field.id() == id:
                 return field

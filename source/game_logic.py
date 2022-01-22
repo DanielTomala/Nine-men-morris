@@ -1,4 +1,5 @@
 import random
+from typing import List, Tuple
 
 from .board import FIELD_IDS, Board
 from .enums import PawnsNumber, Player
@@ -21,7 +22,7 @@ from .interface import (OTHER_PLAYER, print_before_move, print_board,
 # Brak młynka przez 50 ruchów to remis
 
 
-def main():
+def main() -> None:
     print_welcome()
     choose_mode()  # Zwróci liczbę pionków
     board = Board()
@@ -29,7 +30,7 @@ def main():
     start_game(board)
 
 
-def start_game(board: Board):
+def start_game(board: Board) -> None:
     starting_player = get_starting_player()
     board.set_starting_player(starting_player)
     print_starting_player(starting_player)
@@ -38,7 +39,7 @@ def start_game(board: Board):
     moving_pawns_phase(board)
 
 
-def get_starting_player():
+def get_starting_player() -> None:
     num_to_player = {1: Player.FIRST, 2: Player.SECOND}
     number = random.randint(1, 2)
     return num_to_player[number]
@@ -62,7 +63,7 @@ def setting_pawns_phase(board: Board) -> None:
         print_board(board)
 
 
-def moving_pawns_phase(board: Board):
+def moving_pawns_phase(board: Board) -> None:
     print_empty_lines(1)
     while is_game_still_played(board):
         move_pawn_by_player(board, board.starting_player())
@@ -73,7 +74,7 @@ def moving_pawns_phase(board: Board):
     check_winner()
 
 
-def set_pawn_by_player(board: Board, player: Player, pawns_in_hand: int):
+def set_pawn_by_player(board: Board, player: Player, pawns_in_hand: int) -> None:
     print_before_move(player)
     print_pawns_left(board, player, pawns_in_hand)
     field = get_field_condition_field_is_free(
@@ -125,7 +126,7 @@ def move_pawn_by_player(board: Board, player: Player) -> None:
     print_empty_lines(1)
 
 
-def get_field_condition_free_and_connection(board: Board, curr_field: Field, message: str):
+def get_field_condition_free_and_connection(board: Board, curr_field: Field, message: str) -> Field:
     while True:
         field = get_field_condition_field_is_free(board, message)
         if field is None:
@@ -171,7 +172,8 @@ def is_game_still_played(board: Board) -> bool:
     if board.player_pawns_number(Player.FIRST) <= 2 or board.player_pawns_number(Player.SECOND) <= 2:
         return False
     # Koniec gry również gdy nie można wykonać żadnego ruchu
-    if not check_is_any_possible_move(board):
+    # Gdy będzie faza latania to może wykonać każdy ruch
+    if not check_is_any_possible_move(board, Player.FIRST) or not check_is_any_possible_move(board, Player.SECOND):
         return False
     # TODO
     # if check_is_draw():
@@ -179,12 +181,12 @@ def is_game_still_played(board: Board) -> bool:
     return True
 
 
-def check_is_any_possible_move(board: Board):
-    for player in [Player.FIRST, Player.SECOND]:
-        for field in board.get_all_player_fields(player):
-            for connection in field.connections():
-                if board.field_by_id(connection).player() is None:
-                    return True
+def check_is_any_possible_move(board: Board, player: Player) -> bool:
+    for field in board.get_all_player_fields(player):
+        for connection in field.connections():
+            connection_field = board.field_by_id(connection)
+            if board.is_field_free(connection_field):
+                return True
     return False
 
 
@@ -193,7 +195,7 @@ Checks if last move created a mill
 """
 
 
-def check_mill(board: Board, field: Field):
+def check_mill(board: Board, field: Field) -> Tuple[Player, int]:
     mills_num = 0
     if field.coordiantes().position_top_middle_bottom() == pos.MIDDLE or field.coordiantes().position_left_center_right() == pos.CENTER:
         fields_to_check = []
@@ -222,10 +224,12 @@ def check_mill(board: Board, field: Field):
         if all([field.player() == check_field.player() for check_field in fields_to_check]):
             # return field.player()
             mills_num += 1
+    if mills_num == 0:
+        return (None, mills_num)
     return (field.player(), mills_num)
 
 
-def remove_opponents_pawn(board: Board, player: Player):
+def remove_opponents_pawn(board: Board, player: Player) -> None:
     # print_mill_occurred()
     while True:
         field_id = get_user_input(
@@ -242,7 +246,7 @@ def remove_opponents_pawn(board: Board, player: Player):
     board.remove_pawn(board.field_by_id(field_id))
 
 
-def possible_moves(board: Board, field: Field, player: Player):
+def possible_moves(board: Board, field: Field) -> List[str]:
     result = []
     for conenction in field.connections():
         if board.field_by_id(conenction).player() is None:
