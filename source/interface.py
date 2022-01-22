@@ -1,9 +1,11 @@
+from typing import List
 from .board import Board
 from .enums import Player, Position as pos, PositionSquare as pos_sq
 
 OTHER_PLAYER = {Player.FIRST: Player.SECOND,
                 Player.SECOND: Player.FIRST}
 PLAYER_TO_STR = {Player.FIRST: "One", Player.SECOND: "Two"}
+PLAYER_SYMBOL = {Player.FIRST: "$", Player.SECOND: "#"}
 
 
 def print_board(board: Board):
@@ -112,14 +114,21 @@ def print_before_move(player):
     print("-------------------------------------------")
     print(f"Player's number {PLAYER_TO_STR[player].capitalize()} turn")
     # TODO
-    print("Your symbol is ...")
+    print(f"Your symbol is {PLAYER_SYMBOL[player]}")
     print("-------------------------------------------")
 
 
-def print_pawns_left(board, player):
-    pass
+def print_pawns_left(board: Board, player: Player, pawns_in_hand):
+    print(
+        f"Pawns left in hand: {pawns_in_hand* PLAYER_SYMBOL[player]}: {pawns_in_hand}")
+    print(
+        f"Pawns on field: {board.player_pawns_number(player)*PLAYER_SYMBOL[player]}: {board.player_pawns_number(player)}")
     # Pawns Left: ### : 3
     # Pawns Already set: ###### : 6
+
+
+def print_possible_moves(fields: List[str]):
+    print(f"You can move to fields with id's: {fields}")
 
 
 def print_empty_lines(how_many):
@@ -142,12 +151,17 @@ def print_not_your_pawn():
     print("This pawn doesn't belong to you. Try again")
 
 
-def print_mill_occurred():
-    print("You have mill, now you can remove yours opponent pawn!")
+def print_mill_occurred(mill_num: int):
+    print(
+        f"You have {mill_num} mill(s), now you can remove yours opponent {mill_num} pawn(s)!")
 
 
 def print_transition_to_moving_phase():
     print("All pawns are set, let's move to the next phase of the game!")
+
+
+def print_remove_own_pawn():
+    print("You cannot remove your own pawn")
 
 
 def print_instruction():
