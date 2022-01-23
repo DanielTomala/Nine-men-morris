@@ -230,7 +230,7 @@ Checks if last move created a mill
 
 # Czy tu na pewno jest potrzeba zwracania tego playera
 
-
+# młynek dla innych rozmiarów planszy
 def check_mill(board: Board, field: Field) -> Tuple[Player, int]:
     mills_num = 0
     if field.coordiantes().position_top_middle_bottom() == pos.MIDDLE or field.coordiantes().position_left_center_right() == pos.CENTER:

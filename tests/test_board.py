@@ -81,7 +81,7 @@ def test_field_by_positions():
 
 def test_create_nine_pawns_board():
     board = Board()
-    board_fields = board._create_nine_pawns_board()
+    board_fields = board._create_nine_twelve_pawns_board()
     assert board_fields[0].id() == FIELD_IDS[0]
     assert board_fields[0].coordiantes().square() == PositionSquare.OUTER
     assert board_fields[0].coordiantes(
