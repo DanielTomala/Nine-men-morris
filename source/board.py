@@ -78,6 +78,13 @@ class Board:
                 fields_to_return.append(field)
         return fields_to_return
 
+    def get_all_free_fields(self):
+        free_fields = []
+        for field in self._fields:
+            if field.player() is None:
+                free_fields.append(field)
+        return free_fields
+
     def check_is_connection_beetween_fields_nine_pawns(self, current_field: Field, new_field: Field) -> bool:
         current_position_tmb = current_field.coordiantes().position_top_middle_bottom()
         current_position_lcr = current_field.coordiantes().position_left_center_right()
@@ -181,4 +188,34 @@ class Board:
     # |    |         |         |    |
     # |    o---------o---------o    |
     # |              |              |
+    # o--------------o--------------o
+
+    # o---o---o
+    # | ⟍ | ⟋ |
+    # o---o---o
+    # | ⟋ | ⟍ |
+    # o---o---o
+
+    # o---------o---------o
+    # |         |         |
+    # |    o----o----o    |
+    # |    |         |    |
+    # o----o         o----o
+    # |    |         |    |
+    # |    o----o----o    |
+    # |         |         |
+    # o---------o---------o
+
+    # o--------------o--------------o
+    # | \            |           /  |
+    # |    o---------o---------o    |
+    # |    | \       |      /  |    |
+    # |    |    o----o----o    |    |
+    # |    |    |         |    |    |
+    # o----o----o         o----o----o
+    # |    |    |         |    |    |
+    # |    |    o----o----o    |    |
+    # |    | /       |       \ |    |
+    # |    o---------o---------o    |
+    # | /            |            \ |
     # o--------------o--------------o

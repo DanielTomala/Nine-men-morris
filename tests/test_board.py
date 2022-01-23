@@ -232,3 +232,7 @@ def test_get_all_player_fields():
 
     assert board.get_all_player_fields(Player.SECOND) == [
         field_C, field_D, field_U, field_Z]
+
+
+def test_get_all_free_fields():
+    pass
