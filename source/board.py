@@ -93,45 +93,17 @@ class Board:
                 free_fields.append(field)
         return free_fields
 
-    # def check_is_connection_beetween_fields_nine_pawns(self, current_field: Field, new_field: Field) -> bool:
-    #     current_position_tmb = current_field.coordiantes().position_top_middle_bottom()
-    #     current_position_lcr = current_field.coordiantes().position_left_center_right()
-    #     current_position_square = current_field.coordiantes().square()
-    #     new_position_tmb = new_field.coordiantes().position_top_middle_bottom()
-    #     new_position_lcr = new_field.coordiantes().position_left_center_right()
-    #     new_position_square = new_field.coordiantes().square()
-
-    #     if current_position_square == new_position_square:
-    #         if current_position_tmb == new_position_tmb:
-    #             if new_position_lcr.value in [current_position_lcr.value + 1, current_position_lcr.value - 1]:
-    #                 return True
-
-    #         elif current_position_lcr == new_position_lcr:
-    #             if new_position_tmb.value in [current_position_tmb.value + 1, current_position_tmb.value - 1]:
-    #                 return True
-    #     else:
-    #         if (current_position_lcr == pos.CENTER and new_position_lcr == pos.CENTER):
-    #             if current_position_tmb == new_position_tmb:
-    #                 if new_position_square.value in [current_position_square.value + 1, current_position_square.value - 1]:
-    #                     return True
-    #         elif (current_position_tmb == pos.MIDDLE and current_position_tmb == pos.MIDDLE):
-    #             if current_position_lcr == new_position_lcr:
-    #                 if new_position_square.value in [current_position_square.value + 1, current_position_square.value - 1]:
-    #                     return True
-
-    #     return False
-
     def _get_fields_for_pawns_number(self, pawns_number: PawnsNumber):
         if pawns_number == PawnsNumber.NINE:
-            return self._create_nine_twelve_pawns_board()
+            return self._create_fields_nine_or_twelve_pawns()
         elif pawns_number == PawnsNumber.THREE:
-            return self._create_three_pawns_board()
+            return self._create_fields_three_pawns()
         elif pawns_number == PawnsNumber.SIX:
-            return self._create_six_pawns_board()
+            return self._create_fields_six_pawns()
         elif pawns_number == PawnsNumber.TWELVE:
-            return self._create_nine_twelve_pawns_board()
+            return self._create_fields_nine_or_twelve_pawns()
 
-    def _create_nine_twelve_pawns_board(self) -> List[Field]:
+    def _create_fields_nine_or_twelve_pawns(self) -> List[Field]:
         fields_list = []
         id_index = 0
         for square in pos_sq:
@@ -154,7 +126,7 @@ class Board:
                 id_index += 1
         return fields_list
 
-    def _create_six_pawns_board(self) -> List[Field]:
+    def _create_fields_six_pawns(self) -> List[Field]:
         fields_list = []
         id_index = 0
         for square in [pos_sq.OUTER, pos_sq.INNER]:
@@ -162,7 +134,7 @@ class Board:
                 fields_list.append(Field(FIELD_IDS[id_index], Coordinates(
                     square, pos.TOP, position_lcr)))
                 id_index += 1
-        for square in pos_sq:
+        for square in [pos_sq.OUTER, pos_sq.INNER]:
             fields_list.append(Field(FIELD_IDS[id_index], Coordinates(
                 square, pos.MIDDLE, pos.LEFT)))
             id_index += 1
@@ -170,14 +142,14 @@ class Board:
             fields_list.append(Field(FIELD_IDS[id_index], Coordinates(
                 square, pos.MIDDLE, pos.RIGHT)))
             id_index += 1
-        for square in reversed(pos_sq):
+        for square in [pos_sq.INNER, pos_sq.OUTER]:
             for position_lcr in [pos.LEFT, pos.CENTER, pos.RIGHT]:
                 fields_list.append(Field(FIELD_IDS[id_index], Coordinates(
                     square, pos.BOTTOM, position_lcr)))
                 id_index += 1
         return fields_list
 
-    def _create_three_pawns_board(self) -> List[Field]:
+    def _create_fields_three_pawns(self) -> List[Field]:
         fields_list = []
         id_index = 0
 
@@ -190,15 +162,15 @@ class Board:
 
     def set_proper_connections(self, pawns_number):
         if pawns_number == PawnsNumber.NINE:
-            self._set_nine_pawns_connections()
+            self._set_connections_nine_pawns()
         elif pawns_number == PawnsNumber.THREE:
-            self._set_three_pawns_connections()
+            self._set_connections_three_pawns()
         elif pawns_number == PawnsNumber.SIX:
-            self._set_six_pawns_connections()
+            self._set_connections_six_pawns()
         elif pawns_number == PawnsNumber.TWELVE:
-            self._set_twelve_pawns_connections()
+            self._set_connections_twelve_pawns()
 
-    def _set_nine_pawns_connections(self):
+    def _set_connections_nine_pawns(self):
         self.field_by_id("A").set_connections(["B", "J"])
         self.field_by_id("B").set_connections(["A", "C", "E"])
         self.field_by_id("C").set_connections(["B", "O"])
@@ -225,10 +197,10 @@ class Board:
         self.field_by_id("Z").set_connections(["O", "Y"])
 
 # Może by to wczytać z pliku
-    def _set_three_pawns_connections(self):
+    def _set_connections_three_pawns(self):
         self.field_by_id("A").set_connections(["B", "D", "E"])
         self.field_by_id("B").set_connections(["A", "C", "E"])
-        self.field_by_id("C").set_connections(["B", "F"])
+        self.field_by_id("C").set_connections(["B", "F", "E"])
         self.field_by_id("D").set_connections(["A", "E", "G"])
         self.field_by_id("E").set_connections(
             ["A", "B", "C", "D", "F", "G", "H", "I"])
@@ -242,7 +214,7 @@ class Board:
     # D---E---F
     # | ⟋ | ⟍ |
     # G---H---I
-    def _set_six_pawns_connections(self):
+    def _set_connections_six_pawns(self):
         self.field_by_id("A").set_connections(["B", "G"])
         self.field_by_id("B").set_connections(["A", "C", "E"])
         self.field_by_id("C").set_connections(["B", "J"])
@@ -270,7 +242,7 @@ class Board:
     # |         |         |
     # N---------O---------P
 
-    def _set_twelve_pawns_connections(self):
+    def _set_connections_twelve_pawns(self):
         self.field_by_id("A").set_connections(["B", "D", "J"])
         self.field_by_id("B").set_connections(["A", "C", "E"])
         self.field_by_id("C").set_connections(["B", "F", "O"])

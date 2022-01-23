@@ -2,10 +2,10 @@ from typing import List
 from .board import Board
 from .enums import PawnsNumber, Player, Position as pos, PositionSquare as pos_sq
 
-OTHER_PLAYER = {Player.FIRST: Player.SECOND,
-                Player.SECOND: Player.FIRST}
-PLAYER_TO_STR = {Player.FIRST: "One", Player.SECOND: "Two"}
-PLAYER_SYMBOL = {Player.FIRST: "$", Player.SECOND: "#"}
+OTHER_PLAYER = {Player.ONE: Player.TWO,
+                Player.TWO: Player.ONE}
+PLAYER_TO_STR = {Player.ONE: "One", Player.TWO: "Two"}
+PLAYER_SYMBOL = {Player.ONE: "$", Player.TWO: "#"}
 
 
 def print_board(board: Board):
@@ -360,5 +360,5 @@ def print_choose_against_who():
     print("[2] Two players against each other")
 
 
-def print_winner():
-    print("The Winner is: ")
+def print_winner(winner):
+    print(f"The Winner is player {PLAYER_TO_STR[winner]}")

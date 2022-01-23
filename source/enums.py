@@ -30,8 +30,8 @@ class Position(Enum):
 
 
 class Player(Enum):
-    FIRST = 1
-    SECOND = 2
+    ONE = 1
+    TWO = 2
 
 
 class BotLvl(Enum):

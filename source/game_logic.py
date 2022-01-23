@@ -1,6 +1,5 @@
-from ast import arg
+
 import random
-from traceback import print_last
 from typing import List, Tuple
 
 # https://realpython.com/absolute-vs-relative-python-imports/
@@ -12,13 +11,14 @@ from .enums import Position as pos
 from .enums import PositionSquare as pos_sq
 from .field import Field
 from .interface import (OTHER_PLAYER, print_before_move, print_blank_lines,
-                        print_board, print_choose_against_who,
-                        print_choose_pawns_number, print_field_occupied,
-                        print_improper_id, print_last_move, print_last_remove, print_last_set, print_mill_occurred, print_no_pawn,
+                        print_board, print_field_occupied, print_improper_id,
+                        print_last_move, print_last_remove, print_last_set,
+                        print_mill_occurred, print_no_pawn,
                         print_not_your_pawn, print_pawns_left,
                         print_possible_moves, print_remove_own_pawn,
                         print_starting_player,
-                        print_transition_to_moving_phase, print_welcome, print_winner)
+                        print_transition_to_moving_phase, print_welcome,
+                        print_winner)
 
 STR_TO_PAWNS_NUMBER = {"9": PawnsNumber.NINE, "3": PawnsNumber.THREE,
                        "6": PawnsNumber.SIX, "12": PawnsNumber.TWELVE}
@@ -36,7 +36,8 @@ STR_TO_BOT_LVL = {False: BotLvl.OFF, "e": BotLvl.EASY,
 def main(args) -> None:
     print_welcome()
     print_blank_lines(2)
-    board = Board(STR_TO_PAWNS_NUMBER[args.pawns_number], STR_TO_BOT_LVL[args.bot], args.delay)
+    board = Board(
+        STR_TO_PAWNS_NUMBER[args.pawns_number], STR_TO_BOT_LVL[args.bot], args.delay)
     print_board(board)
     start_game(board)
 
@@ -51,7 +52,7 @@ def start_game(board: Board) -> None:
 
 
 def get_starting_player() -> None:
-    num_to_player = {1: Player.FIRST, 2: Player.SECOND}
+    num_to_player = {1: Player.ONE, 2: Player.TWO}
     number = random.randint(1, 2)
     return num_to_player[number]
 
@@ -66,13 +67,13 @@ def setting_pawns_phase(board: Board) -> None:
     second_player_pawns_no = board.pawns_number().value
     while first_player_pawns_no > 0 or second_player_pawns_no > 0:
         # Bot zawsze będzie drugim graczem
-        if board.bot and board.starting_player() == Player.SECOND:
+        if board.bot and board.starting_player() == Player.TWO:
             set_pawn_by_bot(board)
         else:
             set_pawn_by_player(board, board.starting_player(),
                                first_player_pawns_no)
         first_player_pawns_no -= 1
-        if board.bot and OTHER_PLAYER[board.starting_player()] == Player.SECOND:
+        if board.bot and OTHER_PLAYER[board.starting_player()] == Player.TWO:
             set_pawn_by_bot(board)
         else:
             set_pawn_by_player(
@@ -105,19 +106,19 @@ def set_pawn_by_player(board: Board, player: Player, pawns_in_hand: int) -> None
 def moving_pawns_phase(board: Board) -> None:
     print_blank_lines(1)
     while is_game_still_played(board):
-        if board.bot and board.starting_player() == Player.SECOND:
+        if board.bot and board.starting_player() == Player.TWO:
             move_pawn_by_bot(board)
         else:
             move_pawn_by_player(board, board.starting_player())
         if not is_game_still_played(board):
             break
 
-        if board.bot and OTHER_PLAYER[board.starting_player()] == Player.SECOND:
+        if board.bot and OTHER_PLAYER[board.starting_player()] == Player.TWO:
             move_pawn_by_bot(board)
         else:
             move_pawn_by_player(board, OTHER_PLAYER[board.starting_player()])
     # TODO
-    check_winner()
+    check_winner(board)
 
 
 def move_pawn_by_player(board: Board, player: Player) -> None:
@@ -199,11 +200,11 @@ def get_field_condition_proper_player(board: Board, player: Player, message: str
 
 
 def is_game_still_played(board: Board) -> bool:
-    if board.player_pawns_number(Player.FIRST) <= 2 or board.player_pawns_number(Player.SECOND) <= 2:
+    if board.player_pawns_number(Player.ONE) <= 2 or board.player_pawns_number(Player.TWO) <= 2:
         return False
     # Koniec gry również gdy nie można wykonać żadnego ruchu
     # Gdy będzie faza latania to może wykonać każdy ruch
-    if not check_is_any_possible_move(board, Player.FIRST) or not check_is_any_possible_move(board, Player.SECOND):
+    if not check_is_any_possible_move(board, Player.ONE) or not check_is_any_possible_move(board, Player.TWO):
         return False
     # TODO
     if check_is_draw():
@@ -228,20 +229,54 @@ def check_is_draw():
 Checks if last move created a mill
 """
 
-# Czy tu na pewno jest potrzeba zwracania tego playera
 
-# młynek dla innych rozmiarów planszy
 def check_mill(board: Board, field: Field) -> Tuple[Player, int]:
     mills_num = 0
-    if field.coordiantes().position_top_middle_bottom() == pos.MIDDLE or field.coordiantes().position_left_center_right() == pos.CENTER:
+    if board.pawns_number() == PawnsNumber.THREE:
+
+        for position_tmb in [pos.TOP, pos.MIDDLE, pos.BOTTOM]:
+            fields_to_check = []
+            for position_lcr in [pos.LEFT, pos.CENTER, pos.RIGHT]:
+                found_field = board.field_by_positions(
+                    pos_sq.MIDDLE, position_tmb, position_lcr)
+                fields_to_check.append(found_field)
+            if all([field.player() == check_field.player() for check_field in fields_to_check]):
+                mills_num += 1
+        for position_lcr in [pos.LEFT, pos.CENTER, pos.RIGHT]:
+            fields_to_check = []
+            for position_tmb in [pos.TOP, pos.MIDDLE, pos.BOTTOM]:
+                found_field = board.field_by_positions(
+                    pos_sq.MIDDLE, position_tmb, position_lcr)
+                fields_to_check.append(found_field)
+            if all([field.player() == check_field.player() for check_field in fields_to_check]):
+                mills_num += 1
         fields_to_check = []
-        for square in pos_sq:
-            found_field = board.field_by_positions(square, field.coordiantes(
-            ).position_top_middle_bottom(), field.coordiantes().position_left_center_right())
+        for position_tmb, position_lcr in zip([pos.TOP, pos.MIDDLE, pos.BOTTOM], [pos.LEFT, pos.CENTER, pos.RIGHT]):
+            found_field = board.field_by_positions(
+                pos_sq.MIDDLE, position_tmb, position_lcr)
             fields_to_check.append(found_field)
         if all([field.player() == check_field.player() for check_field in fields_to_check]):
-            # return field.player()
             mills_num += 1
+        fields_to_check = []
+        for position_tmb, position_lcr in zip([pos.BOTTOM, pos.MIDDLE, pos.TOP], [pos.LEFT, pos.CENTER, pos.RIGHT]):
+            found_field = board.field_by_positions(
+                pos_sq.MIDDLE, position_tmb, position_lcr)
+            fields_to_check.append(found_field)
+        if all([field.player() == check_field.player() for check_field in fields_to_check]):
+            mills_num += 1
+
+        return (field.player(), mills_num)
+
+    if board.pawns_number() not in [PawnsNumber.THREE, PawnsNumber.SIX]:
+        if field.coordiantes().position_top_middle_bottom() == pos.MIDDLE or field.coordiantes().position_left_center_right() == pos.CENTER:
+            fields_to_check = []
+            for square in pos_sq:
+                found_field = board.field_by_positions(square, field.coordiantes(
+                ).position_top_middle_bottom(), field.coordiantes().position_left_center_right())
+                fields_to_check.append(found_field)
+            if all([field.player() == check_field.player() for check_field in fields_to_check]):
+                # return field.player()
+                mills_num += 1
     if field.coordiantes().position_left_center_right() in [pos.LEFT, pos.RIGHT]:
         fields_to_check = []
         for position in [pos.TOP, pos.MIDDLE, pos.BOTTOM]:
@@ -260,6 +295,16 @@ def check_mill(board: Board, field: Field) -> Tuple[Player, int]:
         if all([field.player() == check_field.player() for check_field in fields_to_check]):
             # return field.player()
             mills_num += 1
+    if board.pawns_number() == PawnsNumber.TWELVE:
+        if (field.coordiantes().position_top_middle_bottom(), field.coordiantes().position_left_center_right()) in [(pos.TOP, pos.LEFT), (pos.TOP, pos.RIGHT), (pos.BOTTOM, pos.LEFT), (pos.BOTTOM, pos.RIGHT)]:
+            fields_to_check = []
+            for square in pos_sq:
+                found_field = board.field_by_positions(square, field.coordiantes(
+                ).position_top_middle_bottom(), field.coordiantes().position_left_center_right())
+                fields_to_check.append(found_field)
+            if all([field.player() == check_field.player() for check_field in fields_to_check]):
+                mills_num += 1
+
     if mills_num == 0:
         return (None, mills_num)
     return (field.player(), mills_num)
@@ -291,32 +336,13 @@ def possible_moves(board: Board, field: Field) -> List[str]:
     return result
 
 
-def check_winner() -> Player:
-    print_winner()
+def check_winner(board: Board) -> Player:
+    if board.player_pawns_number(Player.ONE) <= 2 or not check_is_any_possible_move(board, Player.ONE):
+        winner = Player.TWO
+    elif board.player_pawns_number(Player.TWO) <= 2 or not check_is_any_possible_move(board, Player.TWO):
+        winner = Player.ONE
+    print_winner(winner)
 
 
 def get_user_input(message):
     return input(message)
-
-
-# def choose_pawns_number() -> PawnsNumber:
-#     print_choose_pawns_number()
-#     while True:
-#         mode = get_user_input("Which mode do you choose? Enter mode number: ")
-#         if mode in ["1", "2", "3", "4"]:
-#             break
-#         elif mode in ["6", "9", "12"]:
-#             print("\nPlease enter mode number (1/2/3/4), not the number of pawns")
-#         else:
-#             print("\nPlease enter proper mode number (1/2/3/4)")
-#     return MODE_TO_PAWNS_NUMBER[mode]
-
-
-# def choose_against_who():
-#     print_choose_against_who()
-#     while True:
-#         mode = get_user_input("Which mode do you choose? Enter mode number: ")
-#         if mode in ["1", "2"]:
-#             return mode
-#         else:
-#             print("\nPlease enter proper mode number (1/2)")
