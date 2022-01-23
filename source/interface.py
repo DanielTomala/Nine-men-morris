@@ -102,11 +102,14 @@ def print_inner():
 
 
 def print_welcome():
-    print("WELCOME IN THE MILL GAME!")
+    print("\t\t-------------------------")
+    print("\t\tWELCOME IN THE MILL GAME!")
+    print("\t\t-------------------------")
 
 
 def print_starting_player(player):
     print(f"Player number {PLAYER_TO_STR[player]} will start the game")
+    print_blank_lines(1)
 
 
 def print_before_move(player):
@@ -116,6 +119,7 @@ def print_before_move(player):
     # TODO
     print(f"Your symbol is {PLAYER_SYMBOL[player]}")
     print("-------------------------------------------")
+    print_blank_lines(1)
 
 
 def print_pawns_left(board: Board, player: Player, pawns_in_hand):
@@ -123,50 +127,71 @@ def print_pawns_left(board: Board, player: Player, pawns_in_hand):
         f"Pawns left in hand: {pawns_in_hand* PLAYER_SYMBOL[player]}: {pawns_in_hand}")
     print(
         f"Pawns on field: {board.player_pawns_number(player)*PLAYER_SYMBOL[player]}: {board.player_pawns_number(player)}")
+    print_blank_lines(1)
+
     # Pawns Left: ### : 3
     # Pawns Already set: ###### : 6
 
 
 def print_possible_moves(fields: List[str]):
     print(f"You can move to fields with id's: {fields}")
+    print_blank_lines(1)
 
 
-def print_empty_lines(how_many):
+def print_blank_lines(how_many):
     print((how_many - 1) * "\n")
 
 
 def print_field_occupied():
     print("This field is already occupied. Try again.")
+    print_blank_lines(1)
 
 
 def print_improper_id():
     print("Improper field id. Try again.")
+    print_blank_lines(1)
 
 
 def print_no_pawn():
     print("There is no pawn at this field. Try again.")
+    print_blank_lines(1)
 
 
 def print_not_your_pawn():
     print("This pawn doesn't belong to you. Try again")
+    print_blank_lines(1)
 
 
 def print_mill_occurred(mill_num: int):
     print(
         f"You have {mill_num} mill(s), now you can remove yours opponent {mill_num} pawn(s)!")
+    print_blank_lines(1)
 
 
 def print_transition_to_moving_phase():
     print("All pawns are set, let's move to the next phase of the game!")
+    print_blank_lines(1)
 
 
 def print_remove_own_pawn():
     print("You cannot remove your own pawn")
+    print_blank_lines(1)
 
 
 def print_instruction():
     pass
 
 
-def print_choose_mode():
-    pass
+def print_choose_pawns_number():
+    print("You can choose from four modes of mill game.")
+    print("Each player can have:")
+    print("[1] Nine pawns (classic mode),")
+    print("[2] Three pawns,")
+    print("[3] Six pawns,")
+    print("[4] Twelve pawns.")
+
+
+def print_choose_against_who():
+    print("You can also choose against who do you want to play:")
+    print("[1] One player against bot")
+    print("[2] Two players against each other")
