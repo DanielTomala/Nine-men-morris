@@ -1,21 +1,28 @@
 import random
+from traceback import print_last
 from typing import List, Tuple
 
+# https://realpython.com/absolute-vs-relative-python-imports/
+# Upewnić się czy importy w ten sposób są okej
 from .board import FIELD_IDS, Board
-from .enums import PawnsNumber, Player
+from .bot import move_pawn_by_bot, set_pawn_by_bot
+from .enums import BotLvl, PawnsNumber, Player
 from .enums import Position as pos
 from .enums import PositionSquare as pos_sq
 from .field import Field
-from .interface import (OTHER_PLAYER, print_before_move, print_board, print_choose_against_who,
-                        print_choose_pawns_number, print_blank_lines,
-                        print_field_occupied, print_improper_id,
-                        print_mill_occurred, print_no_pawn,
-                        print_not_your_pawn, print_pawns_left, print_possible_moves, print_remove_own_pawn,
+from .interface import (OTHER_PLAYER, print_before_move, print_blank_lines,
+                        print_board, print_choose_against_who,
+                        print_choose_pawns_number, print_field_occupied,
+                        print_improper_id, print_last_move, print_last_remove, print_last_set, print_mill_occurred, print_no_pawn,
+                        print_not_your_pawn, print_pawns_left,
+                        print_possible_moves, print_remove_own_pawn,
                         print_starting_player,
-                        print_transition_to_moving_phase, print_welcome)
+                        print_transition_to_moving_phase, print_welcome, print_winner)
 
 STR_TO_PAWNS_NUMBER = {"9": PawnsNumber.NINE, "3": PawnsNumber.THREE,
-                        "6": PawnsNumber.SIX, "12": PawnsNumber.TWELVE}
+                       "6": PawnsNumber.SIX, "12": PawnsNumber.TWELVE}
+STR_TO_BOT_LVL = {False: BotLvl.OFF, "e": BotLvl.EASY,
+                  "easy": BotLvl.EASY, "h": BotLvl.HARD, "hard": BotLvl.HARD}
 
 # Podwójny młynek -DONE
 # Koniec gry, gdy nie ma żadnego dostępnego ruchu - DONE
@@ -32,6 +39,7 @@ def main(args) -> None:
     # print_blank_lines(2)
     # choose_against_who()
     board = Board(STR_TO_PAWNS_NUMBER[args.pawns_number])
+    board.set_bot(STR_TO_BOT_LVL[args.bot])
     print_board(board)
     start_game(board)
 
@@ -56,36 +64,34 @@ def get_starting_player() -> None:
 
 def setting_pawns_phase(board: Board) -> None:
     print_blank_lines(1)
+    # Można by jakoś poprawić tę ilość pionków
     first_player_pawns_no = board.pawns_number().value
     second_player_pawns_no = board.pawns_number().value
     while first_player_pawns_no > 0 or second_player_pawns_no > 0:
-        set_pawn_by_player(board, board.starting_player(),
-                           first_player_pawns_no)
+        # Bot zawsze będzie drugim graczem
+        if board.bot and board.starting_player() == Player.SECOND:
+            set_pawn_by_bot(board)
+        else:
+            set_pawn_by_player(board, board.starting_player(),
+                               first_player_pawns_no)
         first_player_pawns_no -= 1
-        print_board(board)
-        set_pawn_by_player(
-            board, OTHER_PLAYER[board.starting_player()], second_player_pawns_no)
+        if board.bot and OTHER_PLAYER[board.starting_player()] == Player.SECOND:
+            set_pawn_by_bot(board)
+        else:
+            set_pawn_by_player(
+                board, OTHER_PLAYER[board.starting_player()], second_player_pawns_no)
         second_player_pawns_no -= 1
-        print_board(board)
-
-
-def moving_pawns_phase(board: Board) -> None:
-    print_blank_lines(1)
-    while is_game_still_played(board):
-        move_pawn_by_player(board, board.starting_player())
-        print_board(board)
-        move_pawn_by_player(board, OTHER_PLAYER[board.starting_player()])
-        print_board(board)
-    # TODO
-    check_winner()
 
 
 def set_pawn_by_player(board: Board, player: Player, pawns_in_hand: int) -> None:
     print_before_move(player)
+    print_board(board)
     print_pawns_left(board, player, pawns_in_hand)
     field = get_field_condition_field_is_free(
         board, "Where do you want to add your pawn: ")
     board.add_pawn(field, player)
+    print_board(board)
+    print_last_set(field.id())
     player_with_mill, mill_num = check_mill(board, field)
     # if player_with_mill is not None:
     #     print_board(board)
@@ -93,13 +99,33 @@ def set_pawn_by_player(board: Board, player: Player, pawns_in_hand: int) -> None
     if mill_num > 0:
         print_mill_occurred(mill_num)
     for _ in range(mill_num):
-        print_board(board)
         remove_opponents_pawn(board, player_with_mill)
     print_blank_lines(1)
+
+# Dodać wyświetlanie jaki był ostatni wykonany ruch
+
+
+def moving_pawns_phase(board: Board) -> None:
+    print_blank_lines(1)
+    while is_game_still_played(board):
+        if board.bot and board.starting_player() == Player.SECOND:
+            move_pawn_by_bot(board)
+        else:
+            move_pawn_by_player(board, board.starting_player())
+        if not is_game_still_played(board):
+            break
+
+        if board.bot and OTHER_PLAYER[board.starting_player()] == Player.SECOND:
+            move_pawn_by_bot(board)
+        else:
+            move_pawn_by_player(board, OTHER_PLAYER[board.starting_player()])
+    # TODO
+    check_winner()
 
 
 def move_pawn_by_player(board: Board, player: Player) -> None:
     print_before_move(player)
+    print_board(board)
     # Podpowiedzi jakie na jakie pola można się ruszyć swoim pionkiem - DONE
     while True:
         curr_field = get_field_condition_proper_player(
@@ -122,12 +148,13 @@ def move_pawn_by_player(board: Board, player: Player) -> None:
             break
 
     board.move_pawn(curr_field, new_field, player)
+    print_board(board)
+    print_last_move(curr_field.id(), new_field.id())
     # Jeżeli nie został wykonany ruch no to nie sprawdza młynka - DONE
     player_with_mill, mill_num = check_mill(board, new_field)
     if mill_num > 0:
         print_mill_occurred(mill_num)
     for _ in range(mill_num):
-        print_board(board)
         remove_opponents_pawn(board, player_with_mill)
     print_blank_lines(1)
 
@@ -204,6 +231,8 @@ def check_is_draw():
 Checks if last move created a mill
 """
 
+# Czy tu na pewno jest potrzeba zwracania tego playera
+
 
 def check_mill(board: Board, field: Field) -> Tuple[Player, int]:
     mills_num = 0
@@ -253,6 +282,8 @@ def remove_opponents_pawn(board: Board, player: Player) -> None:
         else:
             print_improper_id()
     board.remove_pawn(board.field_by_id(field_id))
+    print_board(board)
+    print_last_remove(field_id)
 
 
 def possible_moves(board: Board, field: Field) -> List[str]:
@@ -264,7 +295,7 @@ def possible_moves(board: Board, field: Field) -> List[str]:
 
 
 def check_winner() -> Player:
-    pass
+    print_winner()
 
 
 def get_user_input(message):

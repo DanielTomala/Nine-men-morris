@@ -1,6 +1,6 @@
 from typing import List
 from .coordinates import Coordinates
-from .enums import PawnsNumber, Player, Position as pos, PositionSquare as pos_sq
+from .enums import BotLvl, PawnsNumber, Player, Position as pos, PositionSquare as pos_sq
 from .field import Field
 
 FIELD_IDS = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K",
@@ -13,6 +13,7 @@ class Board:
         self._set_nine_pawns_connections()
         self._pawns_number = pawns_number
         self._starting_player = None
+        self._bot = BotLvl.OFF
 
     def fields(self):
         return self._fields
@@ -25,6 +26,12 @@ class Board:
 
     def set_starting_player(self, player: Player):
         self._starting_player = player
+
+    def bot(self):
+        return self._bot
+
+    def set_bot(self, lvl):
+        self._bot = lvl
 
     """
     After pawn is added, it is checked if mill occured

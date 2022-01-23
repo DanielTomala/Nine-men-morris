@@ -108,17 +108,26 @@ def print_welcome():
 
 
 def print_starting_player(player):
-    print(f"Player number {PLAYER_TO_STR[player]} will start the game")
+    print(f"Player {PLAYER_TO_STR[player]} will start the game")
     print_blank_lines(1)
 
 
 def print_before_move(player):
     # Dodać możliwość podania nazw graczy przed rozgrywką
-    print("-------------------------------------------")
-    print(f"Player's number {PLAYER_TO_STR[player].capitalize()} turn")
+    # Paski na długość tekstu
+    print("\t\t-------------------------")
+    print(f"\t\tPlayer's {PLAYER_TO_STR[player].capitalize()} turn")
     # TODO
-    print(f"Your symbol is {PLAYER_SYMBOL[player]}")
-    print("-------------------------------------------")
+    print(f"\t\tYour symbol is {PLAYER_SYMBOL[player]}")
+    print("\t\t-------------------------")
+    print_blank_lines(1)
+
+
+def print_before_move_bot():
+    # Dodać możliwość podania nazw graczy przed rozgrywką
+    print("\t\t----------")
+    print("\t\tBot's turn")
+    print("\t\t----------")
     print_blank_lines(1)
 
 
@@ -131,6 +140,18 @@ def print_pawns_left(board: Board, player: Player, pawns_in_hand):
 
     # Pawns Left: ### : 3
     # Pawns Already set: ###### : 6
+
+
+def print_last_set(field_id):
+    print(f"Last pawn was set at field {field_id}")
+
+
+def print_last_move(old_field_id, new_field_id):
+    print(f"Last move was from field {old_field_id} to {new_field_id}")
+
+
+def print_last_remove(field_id):
+    print(f"Last pawn was removed from field {field_id}")
 
 
 def print_possible_moves(fields: List[str]):
@@ -168,6 +189,11 @@ def print_mill_occurred(mill_num: int):
     print_blank_lines(1)
 
 
+def print_bot_mill_occurred(mill_num):
+    print(f"Bot has {mill_num} mill(s)")
+    print_blank_lines(1)
+
+
 def print_transition_to_moving_phase():
     print("All pawns are set, let's move to the next phase of the game!")
     print_blank_lines(1)
@@ -195,3 +221,6 @@ def print_choose_against_who():
     print("You can also choose against who do you want to play:")
     print("[1] One player against bot")
     print("[2] Two players against each other")
+
+def print_winner():
+    print("The Winner is: ")

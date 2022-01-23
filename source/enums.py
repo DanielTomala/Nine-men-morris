@@ -32,3 +32,9 @@ class Position(Enum):
 class Player(Enum):
     FIRST = 1
     SECOND = 2
+
+
+class BotLvl(Enum):
+    OFF = 0
+    EASY = 1
+    HARD = 2
