@@ -6,13 +6,16 @@ from .enums import PawnsNumber, Player
 from .enums import Position as pos
 from .enums import PositionSquare as pos_sq
 from .field import Field
-from .interface import (OTHER_PLAYER, print_before_move, print_board,
-                        print_choose_mode, print_empty_lines,
+from .interface import (OTHER_PLAYER, print_before_move, print_board, print_choose_against_who,
+                        print_choose_pawns_number, print_blank_lines,
                         print_field_occupied, print_improper_id,
                         print_mill_occurred, print_no_pawn,
                         print_not_your_pawn, print_pawns_left, print_possible_moves, print_remove_own_pawn,
                         print_starting_player,
                         print_transition_to_moving_phase, print_welcome)
+
+STR_TO_PAWNS_NUMBER = {"9": PawnsNumber.NINE, "3": PawnsNumber.THREE,
+                        "6": PawnsNumber.SIX, "12": PawnsNumber.TWELVE}
 
 # Podwójny młynek -DONE
 # Koniec gry, gdy nie ma żadnego dostępnego ruchu - DONE
@@ -22,10 +25,13 @@ from .interface import (OTHER_PLAYER, print_before_move, print_board,
 # Brak młynka przez 50 ruchów to remis
 
 
-def main() -> None:
+def main(args) -> None:
     print_welcome()
-    choose_mode()  # Zwróci liczbę pionków
-    board = Board()
+    print_blank_lines(2)
+    # pawns_number = choose_pawns_number()  # Zwróci liczbę pionków
+    # print_blank_lines(2)
+    # choose_against_who()
+    board = Board(STR_TO_PAWNS_NUMBER[args.pawns_number])
     print_board(board)
     start_game(board)
 
@@ -49,7 +55,7 @@ def get_starting_player() -> None:
 
 
 def setting_pawns_phase(board: Board) -> None:
-    print_empty_lines(1)
+    print_blank_lines(1)
     first_player_pawns_no = board.pawns_number().value
     second_player_pawns_no = board.pawns_number().value
     while first_player_pawns_no > 0 or second_player_pawns_no > 0:
@@ -64,7 +70,7 @@ def setting_pawns_phase(board: Board) -> None:
 
 
 def moving_pawns_phase(board: Board) -> None:
-    print_empty_lines(1)
+    print_blank_lines(1)
     while is_game_still_played(board):
         move_pawn_by_player(board, board.starting_player())
         print_board(board)
@@ -89,7 +95,7 @@ def set_pawn_by_player(board: Board, player: Player, pawns_in_hand: int) -> None
     for _ in range(mill_num):
         print_board(board)
         remove_opponents_pawn(board, player_with_mill)
-    print_empty_lines(1)
+    print_blank_lines(1)
 
 
 def move_pawn_by_player(board: Board, player: Player) -> None:
@@ -102,7 +108,7 @@ def move_pawn_by_player(board: Board, player: Player) -> None:
         # Dodatkowo sprawdzić czy pola z którymi jest połączenie są zajęte - DONE
         # Anulowanie wyboru danego pola - DONE
         # Od razu blokowanie wykonania ruchu jeżeli nie ma żadnego wolnego pola dookoła -DONE
-        moves = possible_moves(board, curr_field, player)
+        moves = possible_moves(board, curr_field)
         if not moves:
             print("There is no possible move with this pawn")
             continue
@@ -123,7 +129,7 @@ def move_pawn_by_player(board: Board, player: Player) -> None:
     for _ in range(mill_num):
         print_board(board)
         remove_opponents_pawn(board, player_with_mill)
-    print_empty_lines(1)
+    print_blank_lines(1)
 
 
 def get_field_condition_free_and_connection(board: Board, curr_field: Field, message: str) -> Field:
@@ -176,8 +182,8 @@ def is_game_still_played(board: Board) -> bool:
     if not check_is_any_possible_move(board, Player.FIRST) or not check_is_any_possible_move(board, Player.SECOND):
         return False
     # TODO
-    # if check_is_draw():
-    #     return False
+    if check_is_draw():
+        return False
     return True
 
 
@@ -187,6 +193,10 @@ def check_is_any_possible_move(board: Board, player: Player) -> bool:
             connection_field = board.field_by_id(connection)
             if board.is_field_free(connection_field):
                 return True
+    return False
+
+
+def check_is_draw():
     return False
 
 
@@ -230,7 +240,6 @@ def check_mill(board: Board, field: Field) -> Tuple[Player, int]:
 
 
 def remove_opponents_pawn(board: Board, player: Player) -> None:
-    # print_mill_occurred()
     while True:
         field_id = get_user_input(
             "Which pawn would you like to remove? Enter field id: ").upper()
@@ -262,5 +271,24 @@ def get_user_input(message):
     return input(message)
 
 
-def choose_mode() -> PawnsNumber:
-    print_choose_mode()
+# def choose_pawns_number() -> PawnsNumber:
+#     print_choose_pawns_number()
+#     while True:
+#         mode = get_user_input("Which mode do you choose? Enter mode number: ")
+#         if mode in ["1", "2", "3", "4"]:
+#             break
+#         elif mode in ["6", "9", "12"]:
+#             print("\nPlease enter mode number (1/2/3/4), not the number of pawns")
+#         else:
+#             print("\nPlease enter proper mode number (1/2/3/4)")
+#     return MODE_TO_PAWNS_NUMBER[mode]
+
+
+# def choose_against_who():
+#     print_choose_against_who()
+#     while True:
+#         mode = get_user_input("Which mode do you choose? Enter mode number: ")
+#         if mode in ["1", "2"]:
+#             return mode
+#         else:
+#             print("\nPlease enter proper mode number (1/2)")
