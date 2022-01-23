@@ -1,3 +1,4 @@
+from ast import arg
 import random
 from traceback import print_last
 from typing import List, Tuple
@@ -35,11 +36,7 @@ STR_TO_BOT_LVL = {False: BotLvl.OFF, "e": BotLvl.EASY,
 def main(args) -> None:
     print_welcome()
     print_blank_lines(2)
-    # pawns_number = choose_pawns_number()  # Zwróci liczbę pionków
-    # print_blank_lines(2)
-    # choose_against_who()
-    board = Board(STR_TO_PAWNS_NUMBER[args.pawns_number])
-    board.set_bot(STR_TO_BOT_LVL[args.bot])
+    board = Board(STR_TO_PAWNS_NUMBER[args.pawns_number], STR_TO_BOT_LVL[args.bot], args.delay)
     print_board(board)
     start_game(board)
 

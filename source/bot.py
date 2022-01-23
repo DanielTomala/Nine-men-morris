@@ -15,7 +15,7 @@ def set_pawn_by_bot(board: Board):
         _set_pawn_by_bot_easy(board)
     elif board.bot() == BotLvl.HARD:
         _set_pawn_by_bot_hard(board)
-    sleep(3)
+    sleep(board.delay())
 
 
 def move_pawn_by_bot(board: Board):
@@ -24,7 +24,7 @@ def move_pawn_by_bot(board: Board):
         _move_pawn_by_bot_easy(board)
     elif board.bot() == BotLvl.HARD:
         _move_pawn_by_bot_hard(board)
-    sleep(3)
+    sleep(board.delay())
 
 
 def _set_pawn_by_bot_easy(board: Board):

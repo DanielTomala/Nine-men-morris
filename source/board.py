@@ -8,12 +8,13 @@ FIELD_IDS = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K",
 
 
 class Board:
-    def __init__(self, pawns_number: PawnsNumber = PawnsNumber.NINE) -> None:
+    def __init__(self, pawns_number: PawnsNumber = PawnsNumber.NINE, bot: BotLvl = BotLvl.OFF, delay: int = 0) -> None:
         self._fields = self._create_nine_pawns_board()
         self._set_nine_pawns_connections()
         self._pawns_number = pawns_number
         self._starting_player = None
-        self._bot = BotLvl.OFF
+        self._bot = bot
+        self._delay = delay
 
     def fields(self):
         return self._fields
@@ -30,8 +31,8 @@ class Board:
     def bot(self):
         return self._bot
 
-    def set_bot(self, lvl):
-        self._bot = lvl
+    def delay(self):
+        return self._delay
 
     """
     After pawn is added, it is checked if mill occured
