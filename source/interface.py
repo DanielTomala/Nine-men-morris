@@ -1,10 +1,9 @@
-import os
 from typing import List
 
 from .board import Board
-from .consts import (FIELD_IDS, FILES_DIRECTORY, PAWNS_NUMBER_TO_BOARD_FILE,
-                     PLAYER_SYMBOL, PLAYER_TO_STR)
-from .enums import PawnsNumber, Player
+from .consts import (FIELD_IDS, PLAYER_SYMBOL, PLAYER_TO_STR)
+from .enums import Player
+from .file_handler import read_board_from_file
 
 
 def print_board(board: Board):
@@ -20,22 +19,6 @@ def print_board(board: Board):
             board_to_print += char
     print(board_to_print)
     print_blank_lines(1)
-
-
-def get_path_to_file(pawns_number: PawnsNumber):
-    absolute_path = os.path.abspath(__file__)
-    file_directory = os.path.dirname(absolute_path)
-    parnet_directory = os.path.dirname(file_directory)
-    file_path = os.path.join(parnet_directory, FILES_DIRECTORY,
-                             PAWNS_NUMBER_TO_BOARD_FILE[pawns_number])
-    return file_path
-
-
-def read_board_from_file(pawns_number: PawnsNumber):
-    file_path = get_path_to_file(pawns_number)
-    with open(file_path, "r") as nine_board_file:
-        string = nine_board_file.read()
-    return string
 
 
 def print_welcome():
@@ -54,8 +37,6 @@ def print_starting_player(player):
 
 
 def print_before_move(player):
-    # Dodać możliwość podania nazw graczy przed rozgrywką
-    # Paski na długość tekstu
     print("\t\t-----------------")
     print(f"\t\tPlayer's {PLAYER_TO_STR[player].capitalize()} turn")
     print(f"\t\tYour symbol is {PLAYER_SYMBOL[player]}")
@@ -64,7 +45,6 @@ def print_before_move(player):
 
 
 def print_before_move_bot():
-    # Dodać możliwość podania nazw graczy przed rozgrywką
     print("\t\t----------")
     print("\t\tBot's turn")
     print("\t\t----------")
@@ -77,9 +57,6 @@ def print_pawns_left(board: Board, player: Player, pawns_in_hand):
     print(
         f"Pawns on field: {board.player_pawns_number(player)*PLAYER_SYMBOL[player]}: {board.player_pawns_number(player)}")
     print_blank_lines(1)
-
-    # Pawns Left: ### : 3
-    # Pawns Already set: ###### : 6
 
 
 def print_last_set(field_id):
@@ -109,10 +86,6 @@ def print_cancel_move():
 def print_move_canceled():
     print("Move canceled")
     print_blank_lines(1)
-
-
-def print_blank_lines(how_many):
-    print((how_many - 1) * "\n")
 
 
 def print_field_occupied():
@@ -176,6 +149,10 @@ def print_winner(winner):
 
 def print_draw():
     print("No one won, it's draw")
+
+
+def print_blank_lines(how_many):
+    print((how_many - 1) * "\n")
 
 
 def get_user_input(message):
