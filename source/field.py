@@ -1,21 +1,22 @@
 from typing import List
-from .enums import Player
-from .coordinates import Coordinates
+
+from source.coordinates import Coordinates
+from source.enums import Player
 
 
 class Field:
     def __init__(self, id, coordinates: "Coordinates",
                  player: Player = None) -> None:
         self._id = id
-        self._coordiantes = coordinates
+        self._coordinates = coordinates
         self._player = player
         self._connections = None
 
     def id(self):
         return self._id
 
-    def coordiantes(self):
-        return self._coordiantes
+    def coordinates(self):
+        return self._coordinates
 
     def player(self):
         return self._player

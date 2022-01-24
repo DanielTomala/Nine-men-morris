@@ -1,7 +1,7 @@
 import os
 
-from .consts import FILES_DIRECTORY, PAWNS_NUMBER_TO_BOARD_FILE
-from .enums import PawnsNumber
+from source.consts import FILES_DIRECTORY, PAWNS_NUMBER_TO_BOARD_FILE
+from source.enums import PawnsNumber
 
 
 def read_board_from_file(pawns_number: PawnsNumber):

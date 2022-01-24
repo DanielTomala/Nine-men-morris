@@ -1,6 +1,6 @@
-from ..source.coordinates import Coordinates
-from ..source.enums import Position, PositionSquare
 from pytest import raises
+from source.coordinates import Coordinates
+from source.enums import Position, PositionSquare
 
 
 def test_constructor_exception():

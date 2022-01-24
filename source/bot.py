@@ -1,15 +1,13 @@
 import collections
-import copy
 from random import choice
 from time import sleep
 
 import source.game_logic as gl
-
-from .board import Board
-from .enums import BotLvl, Player
-from .interface import (print_before_move_bot, print_board,
-                        print_bot_mill_occurred, print_last_move,
-                        print_last_remove, print_last_set)
+from source.board import Board
+from source.enums import BotLvl, Player
+from source.interface import (print_before_move_bot, print_board,
+                              print_bot_mill_occurred, print_last_move,
+                              print_last_remove, print_last_set)
 
 
 def set_pawn_by_bot(board: Board):
@@ -37,17 +35,17 @@ def move_pawn_by_bot(board: Board):
 def _set_pawn_by_bot_easy(board: Board):
     """Sets pawn at random field from all available"""
 
-    field = choice(board.get_all_free_fields())
+    field = choice(board.all_free_fields())
     board.add_pawn(field, Player.TWO)
     print_board(board)
     print_last_set(field.id())
-    player_with_mill, mill_num = gl.check_mill(board, field)
-    if mill_num > 0:
-        print_bot_mill_occurred(mill_num)
+    _, mills_num = gl.check_mill(board, field)
+    if mills_num > 0:
+        print_bot_mill_occurred(mills_num)
         board.reset_moves_without_mill()
     else:
         board.add_one_move_without_mill()
-    for _ in range(mill_num):
+    for _ in range(mills_num):
         _remove_opponents_pawn_by_bot_easy(board)
 
 
@@ -55,67 +53,74 @@ def _move_pawn_by_bot_easy(board: Board):
     """Makes random move from all available """
 
     all_possible_moves = []
-    for curr_field in board.get_all_player_fields(Player.TWO):
-        for new_field_id in gl.possible_moves(board, curr_field):
-            all_possible_moves.append(
-                (curr_field, board.field_by_id(new_field_id)))
+    for curr_field in board.all_player_fields(Player.TWO):
+        for new_field_id in board.possible_moves(curr_field):
+            new_field = board.field_by_id(new_field_id)
+            all_possible_moves.append((curr_field, new_field))
+
     final_move = choice(all_possible_moves)
     board.move_pawn(final_move[0], final_move[1], Player.TWO)
     print_board(board)
     print_last_move(final_move[0].id(), final_move[1].id())
-    player_with_mill, mill_num = gl.check_mill(board, final_move[1])
-    if mill_num > 0:
-        print_bot_mill_occurred(mill_num)
+
+    _, mills_num = gl.check_mill(board, final_move[1])
+    if mills_num > 0:
+        print_bot_mill_occurred(mills_num)
         board.reset_moves_without_mill()
     else:
         board.add_one_move_without_mill()
-    for _ in range(mill_num):
+    for _ in range(mills_num):
         _remove_opponents_pawn_by_bot_easy(board)
-
-# Bot próbuje postawić pionek na polu sąsiadującym z obecnie już postawionym
-# W pierwszej kolejności wybierane są pola w pobliżu których jest najwięcej innych pionków
 
 
 def _set_pawn_by_bot_hard(board: Board):
+    """Sets pawn as close as it is possible to other already set pawns"""
+
     all_posible_sets = []
-    for curr_field in board.get_all_player_fields(Player.TWO):
-        for new_field_id in gl.possible_moves(board, curr_field):
+    for curr_field in board.all_player_fields(Player.TWO):
+        for new_field_id in board.possible_moves(curr_field):
             all_posible_sets.append(board.field_by_id(new_field_id))
+
     fields_occurences = collections.Counter(all_posible_sets)
     if fields_occurences:
-        max_occurences = max(fields_occurences.values())
-        final_moves = [key for key, val in zip(
-            fields_occurences.keys(), fields_occurences.values()) if val == max_occurences]
-        field = choice(final_moves)
+        max_occur = max(fields_occurences.values())
+        key_val_zip = zip(fields_occurences.keys(), fields_occurences.values())
+        final_fields = [key for key, val in key_val_zip if val == max_occur]
+        field = choice(final_fields)
         board.add_pawn(field, Player.TWO)
         print_board(board)
         print_last_set(field.id())
-        player_with_mill, mill_num = gl.check_mill(board, field)
-        if mill_num > 0:
-            print_bot_mill_occurred(mill_num)
+
+        _, mills_num = gl.check_mill(board, field)
+        if mills_num > 0:
+            print_bot_mill_occurred(mills_num)
             board.reset_moves_without_mill()
         else:
             board.add_one_move_without_mill()
-        for _ in range(mill_num):
+        for _ in range(mills_num):
             _remove_opponents_pawn_by_bot_hard(board)
 
     else:
         _set_pawn_by_bot_easy(board)
 
 
-# Rusza się tak, żeby powstał młynek
 def _move_pawn_by_bot_hard(board: Board):
+    """
+    If move which will cause mill is possible it makes it,
+    else makes random move
+    """
+
     all_possible_moves = []
-    for curr_field in board.get_all_player_fields(Player.TWO):
-        for new_field_id in gl.possible_moves(board, curr_field):
-            all_possible_moves.append(
-                (curr_field, board.field_by_id(new_field_id)))
-    # Sprawdzenie keidy wystąpi młynek -DONE
+    for curr_field in board.all_player_fields(Player.TWO):
+        for new_field_id in board.possible_moves(curr_field):
+            new_field = board.field_by_id(new_field_id)
+            all_possible_moves.append((curr_field, new_field))
+
     moves_with_mill = []
     for move in all_possible_moves:
         board.move_pawn(move[0], move[1], Player.TWO)
-        player_with_mill, mill_num = gl.check_mill(board, move[1])
-        if mill_num != 0:
+        _, mills_num = gl.check_mill(board, move[1])
+        if mills_num != 0:
             moves_with_mill.append(move)
         board.move_pawn(move[1], move[0], Player.TWO)
 
@@ -126,40 +131,42 @@ def _move_pawn_by_bot_hard(board: Board):
     board.move_pawn(final_move[0], final_move[1], Player.TWO)
     print_board(board)
     print_last_move(final_move[0].id(), final_move[1].id())
-    player_with_mill, mill_num = gl.check_mill(board, final_move[1])
-    if mill_num > 0:
-        print_bot_mill_occurred(mill_num)
+
+    _, mills_num = gl.check_mill(board, final_move[1])
+    if mills_num > 0:
+        print_bot_mill_occurred(mills_num)
         board.reset_moves_without_mill()
     else:
         board.add_one_move_without_mill()
-    for _ in range(mill_num):
+    for _ in range(mills_num):
         _remove_opponents_pawn_by_bot_hard(board)
 
 
 def _remove_opponents_pawn_by_bot_easy(board: Board):
     """Removes random opponent's pawn from all available"""
 
-    all_opponents_fields = board.get_all_player_fields(Player.ONE)
-    field = choice(all_opponents_fields)
-    board.remove_pawn(field)
+    all_opponents_fields = board.all_player_fields(Player.ONE)
+    remove_field = choice(all_opponents_fields)
+    board.remove_pawn(remove_field)
     print_board(board)
-    print_last_remove(field.id())
+    print_last_remove(remove_field.id())
 
 
 def _remove_opponents_pawn_by_bot_hard(board: Board):
-    # Usuwa gdy więcej niż jeden w linii
-    all_opponents_fields = board.get_all_player_fields(Player.ONE)
-    adjacent_fields = {}
+    """Removes opponent's pawn which has most pawns around it"""
+
+    all_opponents_fields = board.all_player_fields(Player.ONE)
+    fields_around_no = {}
     for field in all_opponents_fields:
         conn_count = 0
         for connection in field.connections():
             if board.field_by_id(connection).player() == Player.ONE:
                 conn_count += 1
-        adjacent_fields[field] = conn_count
-    max_occurences = max(adjacent_fields.values())
-    final_moves = [key for key, val in zip(
-        adjacent_fields.keys(), adjacent_fields.values()) if val == max_occurences]
-    field = choice(final_moves)
-    board.remove_pawn(field)
+        fields_around_no[field] = conn_count
+    max_occurences = max(fields_around_no.values())
+    key_val_zip = zip(fields_around_no.keys(), fields_around_no.values())
+    final_moves = [key for key, val in key_val_zip if val == max_occurences]
+    remove_field = choice(final_moves)
+    board.remove_pawn(remove_field)
     print_board(board)
-    print_last_remove(field.id())
+    print_last_remove(remove_field.id())

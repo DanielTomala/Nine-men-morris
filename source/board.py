@@ -1,13 +1,13 @@
 from typing import List
 
-from .consts import (CONNECTIONS_NINE, CONNECTIONS_SIX, CONNECTIONS_THREE,
-                     CONNECTIONS_TWELVE, FIELD_IDS, POS_LCR_LIST,
-                     POS_SQ_OI_LIST, POS_TMB_LIST)
-from .coordinates import Coordinates
-from .enums import BotLvl, PawnsNumber, Player
-from .enums import Position as pos
-from .enums import PositionSquare as pos_sq
-from .field import Field
+from source.consts import (CONNECTIONS_NINE, CONNECTIONS_SIX,
+                           CONNECTIONS_THREE, CONNECTIONS_TWELVE, FIELD_IDS,
+                           POS_LCR_LIST, POS_SQ_OI_LIST, POS_TMB_LIST)
+from source.coordinates import Coordinates
+from source.enums import BotLvl, PawnsNumber, Player
+from source.enums import Position as pos
+from source.enums import PositionSquare as pos_sq
+from source.field import Field
 
 
 class Board:
@@ -65,9 +65,6 @@ class Board:
         if field.player():
             field.set_player(None)
 
-    # Check if new field has connection with previous one
-    # TODO check connections
-
     def move_pawn(self, current_field: Field, new_field: Field, player: Player) -> None:
         """
         Method to move player's pawn from one field to another
@@ -79,12 +76,15 @@ class Board:
             new_field.set_player(player)
 
     def is_field_free(self, field: Field) -> bool:
+        """Checks is field free or not"""
+
         return True if field.player() is None else False
 
-    def field_by_positions(self, coordinates: Coordinates) -> Field:
+    def field_by_coordinates(self, coordinates: Coordinates) -> Field:
         """Find and returns field by given coordinates"""
+
         for field in self._fields:
-            if field.coordiantes() == coordinates:
+            if field.coordinates() == coordinates:
                 return field
 
     def field_by_id(self, id: str) -> Field:
@@ -98,15 +98,24 @@ class Board:
 
         return sum(1 for field in self._fields if field.player() == player)
 
-    def get_all_player_fields(self, player: Player) -> List[Field]:
+    def all_player_fields(self, player: Player) -> List[Field]:
         """Returns list of fields occupied by given player's pawns """
 
         return [field for field in self._fields if field.player() == player]
 
-    def get_all_free_fields(self) -> List[Field]:
+    def all_free_fields(self) -> List[Field]:
         """Returns list of all fields without pawn"""
 
         return [field for field in self._fields if field.player() is None]
+
+    def possible_moves(self, field: Field) -> List[str]:
+        """Returns all possible moves (field ids) from given field"""
+
+        field_ids = []
+        for conenction in field.connections():
+            if self.field_by_id(conenction).player() is None:
+                field_ids.append(conenction)
+        return field_ids
 
     def _get_board_fields(self, pawns_number: PawnsNumber) -> List[Field]:
         """
@@ -213,24 +222,31 @@ class Board:
 
     def _set_connections_three_pawns(self) -> None:
         """Set connections between fields at three pawns board"""
-
-        for field_id, connections in zip(CONNECTIONS_THREE.keys(), CONNECTIONS_THREE.values()):
+        keys = CONNECTIONS_THREE.keys()
+        values = CONNECTIONS_THREE.values()
+        for field_id, connections in zip(keys, values):
             self.field_by_id(field_id).set_connections(connections)
 
     def _set_connections_six_pawns(self) -> None:
         """Set connections between fields at six pawns board"""
 
-        for field_id, connections in zip(CONNECTIONS_SIX.keys(), CONNECTIONS_SIX.values()):
+        keys = CONNECTIONS_SIX.keys()
+        values = CONNECTIONS_SIX.values()
+        for field_id, connections in zip(keys, values):
             self.field_by_id(field_id).set_connections(connections)
 
     def _set_connections_nine_pawns(self) -> None:
         """Set connections between fields at nine pawns board"""
 
-        for field_id, connections in zip(CONNECTIONS_NINE.keys(), CONNECTIONS_NINE.values()):
+        keys = CONNECTIONS_NINE.keys()
+        values = CONNECTIONS_NINE.values()
+        for field_id, connections in zip(keys, values):
             self.field_by_id(field_id).set_connections(connections)
 
     def _set_connections_twelve_pawns(self) -> None:
         """Set connections between fields at twelve pawns board"""
 
-        for field_id, connections in zip(CONNECTIONS_TWELVE.keys(), CONNECTIONS_TWELVE.values()):
+        keys = CONNECTIONS_TWELVE.keys()
+        values = CONNECTIONS_TWELVE.values()
+        for field_id, connections in zip(keys, values):
             self.field_by_id(field_id).set_connections(connections)

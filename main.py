@@ -1,7 +1,6 @@
 import argparse
 
 from source.consts import BOT_HELP, DELAY_HELP, PAWNS_NUMBER_HELP
-
 from source.game_logic import main
 
 if __name__ == "__main__":
@@ -11,6 +10,6 @@ if __name__ == "__main__":
     parser.add_argument(
         "-b", "--bot", help=BOT_HELP, choices=["e", "easy", "h", "hard"], default=False)
     parser.add_argument(
-        "-d", "--delay", help=DELAY_HELP, type=int, default=0)
+        "-d", "--delay", help=DELAY_HELP, type=float, default=0)
     args = parser.parse_args()
     main(args)

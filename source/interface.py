@@ -1,9 +1,9 @@
 from typing import List
 
-from .board import Board
-from .consts import (FIELD_IDS, PLAYER_SYMBOL, PLAYER_TO_STR)
-from .enums import Player
-from .file_handler import read_board_from_file
+from source.board import Board
+from source.consts import FIELD_IDS, PLAYER_SYMBOL, PLAYER_TO_STR
+from source.enums import Player
+from source.file_handler import read_board_from_file
 
 
 def print_board(board: Board):
@@ -25,10 +25,14 @@ def print_welcome():
     print("\t\t-------------------------")
     print("\t\tWELCOME IN THE MILL GAME!")
     print("\t\t-------------------------")
+    print_blank_lines(1)
 
 
 def print_instruction():
-    pass
+    print("Below you can see mill board. One on the left is board where you play,")
+    print("while one the right is to help you with field id identification.")
+    print("Program will let you now, what phase of the game is and what you have to do.")
+    print("\nGOOD LUCK and HAVE FUN during the MILL GAME!")
 
 
 def print_starting_player(player):
@@ -114,12 +118,13 @@ def print_remove_own_pawn():
 
 
 def print_no_possible_move():
-    print("There is no possible move with this pawn")
+    print("There is no possible move with this pawn. Try again.")
     print_blank_lines(1)
 
 
 def print_no_connection():
-    print("There is no connection beetween these fields")
+    print("There is no connection beetween these fields. Try again.")
+    print_blank_lines(1)
 
 
 def print_mill_occurred(mill_num: int):
