@@ -205,69 +205,17 @@ class Board:
     def _set_connections_three_pawns(self) -> None:
         """Set connections between fields at three pawns board"""
 
-        # self.field_by_id("A").set_connections(["B", "D", "E"])
-        # self.field_by_id("B").set_connections(["A", "C", "E"])
-        # self.field_by_id("C").set_connections(["B", "F", "E"])
-        # self.field_by_id("D").set_connections(["A", "E", "G"])
-        # self.field_by_id("E").set_connections(
-        #     ["A", "B", "C", "D", "F", "G", "H", "I"])
-        # self.field_by_id("F").set_connections(["C", "E", "I"])
-        # self.field_by_id("G").set_connections(["D", "E", "H"])
-        # self.field_by_id("H").set_connections(["E", "G", "I"])
-        # self.field_by_id("I").set_connections(["E", "F", "H"])
-
         for field_id, connections in zip(CONNECTIONS_THREE.keys(), CONNECTIONS_THREE.values()):
             self.field_by_id(field_id).set_connections(connections)
 
     def _set_connections_six_pawns(self) -> None:
         """Set connections between fields at six pawns board"""
 
-        # self.field_by_id("A").set_connections(["B", "G"])
-        # self.field_by_id("B").set_connections(["A", "C", "E"])
-        # self.field_by_id("C").set_connections(["B", "J"])
-        # self.field_by_id("D").set_connections(["E", "H"])
-        # self.field_by_id("E").set_connections(["B", "D", "F"])
-        # self.field_by_id("F").set_connections(["E", "I"])
-        # self.field_by_id("G").set_connections(["A", "H", "N"])
-        # self.field_by_id("H").set_connections(["D", "G", "K"])
-        # self.field_by_id("I").set_connections(["F", "J", "M"])
-        # self.field_by_id("J").set_connections(["C", "I", "P"])
-        # self.field_by_id("K").set_connections(["H", "L"])
-        # self.field_by_id("L").set_connections(["K", "M", "O"])
-        # self.field_by_id("M").set_connections(["I", "L"])
-        # self.field_by_id("N").set_connections(["G", "O"])
-        # self.field_by_id("O").set_connections(["L", "N", "P"])
-        # self.field_by_id("P").set_connections(["J", "O"])
         for field_id, connections in zip(CONNECTIONS_SIX.keys(), CONNECTIONS_SIX.values()):
             self.field_by_id(field_id).set_connections(connections)
 
     def _set_connections_nine_pawns(self) -> None:
         """Set connections between fields at nine pawns board"""
-
-        # self.field_by_id("A").set_connections(["B", "J"])
-        # self.field_by_id("B").set_connections(["A", "C", "E"])
-        # self.field_by_id("C").set_connections(["B", "O"])
-        # self.field_by_id("D").set_connections(["E", "K"])
-        # self.field_by_id("E").set_connections(["B", "D", "F", "H"])
-        # self.field_by_id("F").set_connections(["E", "N"])
-        # self.field_by_id("G").set_connections(["H", "L"])
-        # self.field_by_id("H").set_connections(["E", "G", "I"])
-        # self.field_by_id("I").set_connections(["H", "M"])
-        # self.field_by_id("J").set_connections(["A", "K", "X"])
-        # self.field_by_id("K").set_connections(["D", "J", "L", "T"])
-        # self.field_by_id("L").set_connections(["G", "K", "P"])
-        # self.field_by_id("M").set_connections(["I", "N", "S"])
-        # self.field_by_id("N").set_connections(["F", "M", "O", "W"])
-        # self.field_by_id("O").set_connections(["C", "N", "Z"])
-        # self.field_by_id("P").set_connections(["L", "R"])
-        # self.field_by_id("R").set_connections(["P", "S", "U"])
-        # self.field_by_id("S").set_connections(["M", "R"])
-        # self.field_by_id("T").set_connections(["K", "U"])
-        # self.field_by_id("U").set_connections(["R", "T", "W", "Y"])
-        # self.field_by_id("W").set_connections(["N", "U"])
-        # self.field_by_id("X").set_connections(["J", "Y"])
-        # self.field_by_id("Y").set_connections(["U", "X", "Z"])
-        # self.field_by_id("Z").set_connections(["O", "Y"])
 
         for field_id, connections in zip(CONNECTIONS_NINE.keys(), CONNECTIONS_NINE.values()):
             self.field_by_id(field_id).set_connections(connections)
@@ -275,30 +223,6 @@ class Board:
     def _set_connections_twelve_pawns(self) -> None:
         """Set connections between fields at twelve pawns board"""
 
-        # self.field_by_id("A").set_connections(["B", "D", "J"])
-        # self.field_by_id("B").set_connections(["A", "C", "E"])
-        # self.field_by_id("C").set_connections(["B", "F", "O"])
-        # self.field_by_id("D").set_connections(["A", "E", "G", "K"])
-        # self.field_by_id("E").set_connections(["B", "D", "F", "H"])
-        # self.field_by_id("F").set_connections(["C", "E", "I", "N"])
-        # self.field_by_id("G").set_connections(["D", "H", "L"])
-        # self.field_by_id("H").set_connections(["E", "G", "I"])
-        # self.field_by_id("I").set_connections(["F", "H", "M"])
-        # self.field_by_id("J").set_connections(["A", "K", "X"])
-        # self.field_by_id("K").set_connections(["D", "J", "L", "T"])
-        # self.field_by_id("L").set_connections(["G", "K", "P"])
-        # self.field_by_id("M").set_connections(["I", "N", "S"])
-        # self.field_by_id("N").set_connections(["F", "M", "O", "W"])
-        # self.field_by_id("O").set_connections(["C", "N", "Z"])
-        # self.field_by_id("P").set_connections(["L", "R", "T"])
-        # self.field_by_id("R").set_connections(["P", "S", "U"])
-        # self.field_by_id("S").set_connections(["M", "R", "W"])
-        # self.field_by_id("T").set_connections(["K", "P", "U", "X"])
-        # self.field_by_id("U").set_connections(["R", "T", "W", "Y"])
-        # self.field_by_id("W").set_connections(["N", "S", "U", "Z"])
-        # self.field_by_id("X").set_connections(["J", "T", "Y"])
-        # self.field_by_id("Y").set_connections(["U", "X", "Z"])
-        # self.field_by_id("Z").set_connections(["O", "W", "Y"])
         for field_id, connections in zip(CONNECTIONS_TWELVE.keys(), CONNECTIONS_TWELVE.values()):
             self.field_by_id(field_id).set_connections(connections)
 

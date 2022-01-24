@@ -20,6 +20,12 @@ STR_TO_PAWNS_NUMBER = {"9": PawnsNumber.NINE, "3": PawnsNumber.THREE,
 STR_TO_BOT_LVL = {False: BotLvl.OFF, "e": BotLvl.EASY,
                   "easy": BotLvl.EASY, "h": BotLvl.HARD, "hard": BotLvl.HARD}
 
+FILES_DIRECTORY = "files"
+PAWNS_NUMBER_TO_BOARD_FILE = {PawnsNumber.NINE: "nine_board.txt",
+                              PawnsNumber.THREE: "three_board.txt",
+                              PawnsNumber.SIX: "six_board.txt",
+                              PawnsNumber.TWELVE: "twelve_board.txt"}
+
 CONNECTIONS_THREE = {"A": ["B", "D", "E"],
                      "B": ["A", "C", "E"],
                      "C": ["B", "F", "E"],
