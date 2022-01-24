@@ -1,18 +1,16 @@
 import random
 
-import pytest
-
 from ..source.board import Board
 from ..source.enums import PawnsNumber, Player
-from ..source.game_logic import (check_is_any_possible_move, check_mill,
-                                 get_starting_player, possible_moves)
+from ..source.game_logic import (is_any_possible_move, check_mill,
+                                 draw_starting_player, possible_moves)
 
 
 def test_get_starting_player(monkeypatch):
     def mock_randint(s, e):
         return 1
     monkeypatch.setattr(random, "randint", mock_randint)
-    player = get_starting_player()
+    player = draw_starting_player()
     assert player == Player.ONE
 
 
@@ -35,7 +33,6 @@ def test_check_mill_three_pawns():
 
     field_D.set_player(Player.ONE)
     field_G.set_player(Player.ONE)
-
 
     assert check_mill(board_1, field_A) == (Player.ONE, 2)
     assert check_mill(board_1, field_D) == (Player.ONE, 1)
@@ -299,20 +296,20 @@ def test_check_is_any_possible_move():
     board_1.field_by_id("B").set_player(Player.TWO)
     board_1.field_by_id("J").set_player(Player.TWO)
 
-    assert not check_is_any_possible_move(board_1, Player.ONE)
-    assert check_is_any_possible_move(board_1, Player.TWO)
+    assert not is_any_possible_move(board_1, Player.ONE)
+    assert is_any_possible_move(board_1, Player.TWO)
 
     board_1.field_by_id("C").set_player(Player.ONE)
 
-    assert check_is_any_possible_move(board_1, Player.ONE)
-    assert check_is_any_possible_move(board_1, Player.TWO)
+    assert is_any_possible_move(board_1, Player.ONE)
+    assert is_any_possible_move(board_1, Player.TWO)
 
     board_1.field_by_id("E").set_player(Player.ONE)
     board_1.field_by_id("K").set_player(Player.ONE)
     board_1.field_by_id("X").set_player(Player.ONE)
 
-    assert check_is_any_possible_move(board_1, Player.ONE)
-    assert not check_is_any_possible_move(board_1, Player.TWO)
+    assert is_any_possible_move(board_1, Player.ONE)
+    assert not is_any_possible_move(board_1, Player.TWO)
 
     board_2 = Board(PawnsNumber.NINE)
     board_2.field_by_id("K").set_player(Player.ONE)
@@ -320,11 +317,11 @@ def test_check_is_any_possible_move():
     board_2.field_by_id("L").set_player(Player.TWO)
     board_2.field_by_id("T").set_player(Player.TWO)
 
-    assert check_is_any_possible_move(board_2, Player.ONE)
+    assert is_any_possible_move(board_2, Player.ONE)
 
     board_2.field_by_id("J").set_player(Player.TWO)
 
-    assert not check_is_any_possible_move(board_2, Player.ONE)
+    assert not is_any_possible_move(board_2, Player.ONE)
 
 
 def test_is_game_still_played():

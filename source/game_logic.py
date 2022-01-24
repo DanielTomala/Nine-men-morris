@@ -6,11 +6,14 @@ from typing import List, Tuple
 # Upewnić się czy importy w ten sposób są okej
 from .board import FIELD_IDS, Board
 from .bot import move_pawn_by_bot, set_pawn_by_bot
+from .consts import (NUM_TO_PLAYER, OTHER_PLAYER, POS_LCR_LIST, POS_TMB_LIST, STR_TO_BOT_LVL,
+                     STR_TO_PAWNS_NUMBER, OTHER_PLAYER)
+from .coordinates import Coordinates
 from .enums import BotLvl, PawnsNumber, Player
 from .enums import Position as pos
 from .enums import PositionSquare as pos_sq
 from .field import Field
-from .interface import (OTHER_PLAYER, print_before_move, print_blank_lines,
+from .interface import (print_before_move, print_blank_lines,
                         print_board, print_field_occupied, print_improper_id,
                         print_last_move, print_last_remove, print_last_set,
                         print_mill_occurred, print_no_pawn,
@@ -19,11 +22,6 @@ from .interface import (OTHER_PLAYER, print_before_move, print_blank_lines,
                         print_starting_player,
                         print_transition_to_moving_phase, print_welcome,
                         print_winner)
-
-STR_TO_PAWNS_NUMBER = {"9": PawnsNumber.NINE, "3": PawnsNumber.THREE,
-                       "6": PawnsNumber.SIX, "12": PawnsNumber.TWELVE}
-STR_TO_BOT_LVL = {False: BotLvl.OFF, "e": BotLvl.EASY,
-                  "easy": BotLvl.EASY, "h": BotLvl.HARD, "hard": BotLvl.HARD}
 
 # Podwójny młynek -DONE
 # Koniec gry, gdy nie ma żadnego dostępnego ruchu - DONE
@@ -34,90 +32,96 @@ STR_TO_BOT_LVL = {False: BotLvl.OFF, "e": BotLvl.EASY,
 
 
 def main(args) -> None:
+    """
+    Main function, game starts here
+    Introduction is printed, and board instance is created
+    """
+
     print_welcome()
     print_blank_lines(2)
-    board = Board(
-        STR_TO_PAWNS_NUMBER[args.pawns_number], STR_TO_BOT_LVL[args.bot], args.delay)
+    pawns_number = STR_TO_PAWNS_NUMBER[args.pawns_number]
+    bot_lvl = STR_TO_BOT_LVL[args.bot]
+    board = Board(pawns_number, bot_lvl, args.delay)
     print_board(board)
     start_game(board)
 
 
 def start_game(board: Board) -> None:
-    starting_player = get_starting_player()
-    board.set_starting_player(starting_player)
-    print_starting_player(starting_player)
+    draw_starting_player(board)
     setting_pawns_phase(board)
     print_transition_to_moving_phase()
     moving_pawns_phase(board)
 
 
-def get_starting_player() -> None:
-    num_to_player = {1: Player.ONE, 2: Player.TWO}
+def draw_starting_player(board: Board) -> None:
+    """Draw starting player and sets it in board"""
+
     number = random.randint(1, 2)
-    return num_to_player[number]
+    board.set_starting_player(NUM_TO_PLAYER[number])
+    print_starting_player(NUM_TO_PLAYER[number])
 
 # Przenieść wszystkie printy do interfejsu - DONE
 # Dodać wyświetlanie pionków, które pozostały do umieszczenie i które zostały zbite - DONE
 
 
 def setting_pawns_phase(board: Board) -> None:
+    """Continues until all pawns for each player are set"""
+
     print_blank_lines(1)
     # Można by jakoś poprawić tę ilość pionków
-    first_player_pawns_no = board.pawns_number().value
-    second_player_pawns_no = board.pawns_number().value
-    while first_player_pawns_no > 0 or second_player_pawns_no > 0:
+    player_one_pawns_no = board.pawns_number().value
+    player_two_pawns_no = board.pawns_number().value
+    while player_one_pawns_no > 0 or player_two_pawns_no > 0:
         # Bot zawsze będzie drugim graczem
         if board.bot and board.starting_player() == Player.TWO:
             set_pawn_by_bot(board)
         else:
             set_pawn_by_player(board, board.starting_player(),
-                               first_player_pawns_no)
-        first_player_pawns_no -= 1
+                               player_one_pawns_no)
+        player_one_pawns_no -= 1
         if board.bot and OTHER_PLAYER[board.starting_player()] == Player.TWO:
             set_pawn_by_bot(board)
         else:
             set_pawn_by_player(
-                board, OTHER_PLAYER[board.starting_player()], second_player_pawns_no)
-        second_player_pawns_no -= 1
+                board, OTHER_PLAYER[board.starting_player()], player_two_pawns_no)
+        player_two_pawns_no -= 1
 
 
 def set_pawn_by_player(board: Board, player: Player, pawns_in_hand: int) -> None:
     print_before_move(player)
     print_board(board)
     print_pawns_left(board, player, pawns_in_hand)
-    field = get_field_condition_field_is_free(
+    field = get_free_field(
         board, "Where do you want to add your pawn: ")
     board.add_pawn(field, player)
     print_board(board)
     print_last_set(field.id())
     player_with_mill, mill_num = check_mill(board, field)
-    # if player_with_mill is not None:
-    #     print_board(board)
-    #     remove_opponents_pawn(board, player_with_mill)
+
     if mill_num > 0:
         print_mill_occurred(mill_num)
     for _ in range(mill_num):
         remove_opponents_pawn(board, player_with_mill)
     print_blank_lines(1)
 
-# Dodać wyświetlanie jaki był ostatni wykonany ruch
+# Dodać wyświetlanie jaki był ostatni wykonany ruch - DONE
 
 
 def moving_pawns_phase(board: Board) -> None:
     print_blank_lines(1)
     while is_game_still_played(board):
-        if board.bot and board.starting_player() == Player.TWO:
+        if board.bot() and board.starting_player() == Player.TWO:
             move_pawn_by_bot(board)
         else:
             move_pawn_by_player(board, board.starting_player())
         if not is_game_still_played(board):
             break
 
-        if board.bot and OTHER_PLAYER[board.starting_player()] == Player.TWO:
+        if board.bot() and OTHER_PLAYER[board.starting_player()] == Player.TWO:
             move_pawn_by_bot(board)
         else:
             move_pawn_by_player(board, OTHER_PLAYER[board.starting_player()])
-    # TODO
+
     check_winner(board)
 
 
@@ -126,7 +130,7 @@ def move_pawn_by_player(board: Board, player: Player) -> None:
     print_board(board)
     # Podpowiedzi jakie na jakie pola można się ruszyć swoim pionkiem - DONE
     while True:
-        curr_field = get_field_condition_proper_player(
+        curr_field = get_players_field(
             board, player, "Which pawn do you want to move? Enter field id: ")
 
         # Dodatkowo sprawdzić czy pola z którymi jest połączenie są zajęte - DONE
@@ -140,7 +144,7 @@ def move_pawn_by_player(board: Board, player: Player) -> None:
 
         print_possible_moves(moves)
 
-        new_field = get_field_condition_free_and_connection(
+        new_field = get_free_field_with_connection(
             board, curr_field, "Where do you want to move your pawn? Enter field id: ")
         if new_field is not None:
             break
@@ -157,9 +161,9 @@ def move_pawn_by_player(board: Board, player: Player) -> None:
     print_blank_lines(1)
 
 
-def get_field_condition_free_and_connection(board: Board, curr_field: Field, message: str) -> Field:
+def get_free_field_with_connection(board: Board, curr_field: Field, message: str) -> Field:
     while True:
-        field = get_field_condition_field_is_free(board, message)
+        field = get_free_field(board, message)
         if field is None:
             return None
         if field.id() in curr_field.connections():
@@ -168,7 +172,7 @@ def get_field_condition_free_and_connection(board: Board, curr_field: Field, mes
             print("There is no connection beetween these fields")
 
 
-def get_field_condition_field_is_free(board: Board, message: str) -> Field:
+def get_free_field(board: Board, message: str) -> Field:
     # Czy tu nie będzie nieskończonej pętli kiedyś? - RACZEJ NIE
     while True:
         id = get_user_input(message).upper()
@@ -184,7 +188,7 @@ def get_field_condition_field_is_free(board: Board, message: str) -> Field:
             print_improper_id()
 
 
-def get_field_condition_proper_player(board: Board, player: Player, message: str) -> Field:
+def get_players_field(board: Board, player: Player, message: str) -> Field:
     while True:
         id = get_user_input(message).upper()
         if id in FIELD_IDS:
@@ -204,7 +208,7 @@ def is_game_still_played(board: Board) -> bool:
         return False
     # Koniec gry również gdy nie można wykonać żadnego ruchu
     # Gdy będzie faza latania to może wykonać każdy ruch
-    if not check_is_any_possible_move(board, Player.ONE) or not check_is_any_possible_move(board, Player.TWO):
+    if not is_any_possible_move(board, Player.ONE) or not is_any_possible_move(board, Player.TWO):
         return False
     # TODO
     if check_is_draw():
@@ -212,7 +216,7 @@ def is_game_still_played(board: Board) -> bool:
     return True
 
 
-def check_is_any_possible_move(board: Board, player: Player) -> bool:
+def is_any_possible_move(board: Board, player: Player) -> bool:
     for field in board.get_all_player_fields(player):
         for connection in field.connections():
             connection_field = board.field_by_id(connection)
@@ -225,89 +229,99 @@ def check_is_draw():
     return False
 
 
-"""
-Checks if last move created a mill
-"""
-
-
 def check_mill(board: Board, field: Field) -> Tuple[Player, int]:
+    """Checks if last move created a mill"""
+
     mills_num = 0
+    field_position_tmb = field.coordiantes().position_top_middle_bottom()
+    field_position_lcr = field.coordiantes().position_left_center_right()
+    field_square = field.coordiantes().square()
+
     if board.pawns_number() == PawnsNumber.THREE:
+        return _check_mill_three_pawns(board, field)
 
-        for position_tmb in [pos.TOP, pos.MIDDLE, pos.BOTTOM]:
-            fields_to_check = []
-            for position_lcr in [pos.LEFT, pos.CENTER, pos.RIGHT]:
-                found_field = board.field_by_positions(
-                    pos_sq.MIDDLE, position_tmb, position_lcr)
-                fields_to_check.append(found_field)
-            if all([field.player() == check_field.player() for check_field in fields_to_check]):
-                mills_num += 1
-        for position_lcr in [pos.LEFT, pos.CENTER, pos.RIGHT]:
-            fields_to_check = []
-            for position_tmb in [pos.TOP, pos.MIDDLE, pos.BOTTOM]:
-                found_field = board.field_by_positions(
-                    pos_sq.MIDDLE, position_tmb, position_lcr)
-                fields_to_check.append(found_field)
-            if all([field.player() == check_field.player() for check_field in fields_to_check]):
-                mills_num += 1
-        fields_to_check = []
-        for position_tmb, position_lcr in zip([pos.TOP, pos.MIDDLE, pos.BOTTOM], [pos.LEFT, pos.CENTER, pos.RIGHT]):
-            found_field = board.field_by_positions(
-                pos_sq.MIDDLE, position_tmb, position_lcr)
-            fields_to_check.append(found_field)
-        if all([field.player() == check_field.player() for check_field in fields_to_check]):
-            mills_num += 1
-        fields_to_check = []
-        for position_tmb, position_lcr in zip([pos.BOTTOM, pos.MIDDLE, pos.TOP], [pos.LEFT, pos.CENTER, pos.RIGHT]):
-            found_field = board.field_by_positions(
-                pos_sq.MIDDLE, position_tmb, position_lcr)
-            fields_to_check.append(found_field)
-        if all([field.player() == check_field.player() for check_field in fields_to_check]):
-            mills_num += 1
+    if board.pawns_number() != PawnsNumber.SIX:
+        if field_position_tmb == pos.MIDDLE or field_position_lcr == pos.CENTER:
+            mills_num += _check_mill_square_loop(
+                board, field, field_position_tmb, field_position_lcr)
 
-        return (field.player(), mills_num)
+    if field_position_lcr in [pos.LEFT, pos.RIGHT]:
+        mills_num += _check_mill_position_tmb_loop(
+            board, field, field_square, field_position_lcr)
 
-    if board.pawns_number() not in [PawnsNumber.THREE, PawnsNumber.SIX]:
-        if field.coordiantes().position_top_middle_bottom() == pos.MIDDLE or field.coordiantes().position_left_center_right() == pos.CENTER:
-            fields_to_check = []
-            for square in pos_sq:
-                found_field = board.field_by_positions(square, field.coordiantes(
-                ).position_top_middle_bottom(), field.coordiantes().position_left_center_right())
-                fields_to_check.append(found_field)
-            if all([field.player() == check_field.player() for check_field in fields_to_check]):
-                # return field.player()
-                mills_num += 1
-    if field.coordiantes().position_left_center_right() in [pos.LEFT, pos.RIGHT]:
-        fields_to_check = []
-        for position in [pos.TOP, pos.MIDDLE, pos.BOTTOM]:
-            found_field = board.field_by_positions(field.coordiantes().square(
-            ), position, field.coordiantes().position_left_center_right())
-            fields_to_check.append(found_field)
-        if all([field.player() == check_field.player() for check_field in fields_to_check]):
-            # return field.player()
-            mills_num += 1
-    if field.coordiantes().position_top_middle_bottom() in [pos.TOP, pos.BOTTOM]:
-        fields_to_check = []
-        for position in [pos.LEFT, pos.CENTER, pos.RIGHT]:
-            found_field = board.field_by_positions(field.coordiantes().square(
-            ), field.coordiantes().position_top_middle_bottom(), position)
-            fields_to_check.append(found_field)
-        if all([field.player() == check_field.player() for check_field in fields_to_check]):
-            # return field.player()
-            mills_num += 1
+    if field_position_tmb in [pos.TOP, pos.BOTTOM]:
+        mills_num += _check_mill_position_lcr_loop(
+            board, field, field_square, field_position_tmb)
+
     if board.pawns_number() == PawnsNumber.TWELVE:
-        if (field.coordiantes().position_top_middle_bottom(), field.coordiantes().position_left_center_right()) in [(pos.TOP, pos.LEFT), (pos.TOP, pos.RIGHT), (pos.BOTTOM, pos.LEFT), (pos.BOTTOM, pos.RIGHT)]:
-            fields_to_check = []
-            for square in pos_sq:
-                found_field = board.field_by_positions(square, field.coordiantes(
-                ).position_top_middle_bottom(), field.coordiantes().position_left_center_right())
-                fields_to_check.append(found_field)
-            if all([field.player() == check_field.player() for check_field in fields_to_check]):
-                mills_num += 1
+        if (field_position_tmb, field_position_lcr) in [(pos.TOP, pos.LEFT), (pos.TOP, pos.RIGHT), (pos.BOTTOM, pos.LEFT), (pos.BOTTOM, pos.RIGHT)]:
+            mills_num += _check_mill_square_loop(
+                board, field, field_position_tmb, field_position_lcr)
 
     if mills_num == 0:
         return (None, mills_num)
     return (field.player(), mills_num)
+
+
+def _check_mill_three_pawns(board: Board, field: Field):
+    mills_num = 0
+    for position_tmb in POS_TMB_LIST:
+        mills_num += _check_mill_position_lcr_loop(
+            board, field, pos_sq.MIDDLE, position_tmb)
+
+    for position_lcr in POS_LCR_LIST:
+        mills_num += _check_mill_position_tmb_loop(
+            board, field, pos_sq.MIDDLE, position_lcr)
+
+    mills_num += _check_mill_zip_loop(board, field, pos_sq.MIDDLE,  zip(
+        POS_TMB_LIST, POS_LCR_LIST))
+
+    mills_num += _check_mill_zip_loop(board, field, pos_sq.MIDDLE, zip(
+        reversed(POS_TMB_LIST), POS_LCR_LIST))
+
+    return (field.player(), mills_num)
+
+
+def _check_mill_position_lcr_loop(board: Board, field: Field, square, position_tmb):
+    fields_to_check = []
+    for position_lcr in POS_LCR_LIST:
+        coord = Coordinates(square, position_tmb, position_lcr)
+        found_field = board.field_by_positions(coord)
+        fields_to_check.append(found_field)
+    return _check_mill_condition(field, fields_to_check)
+
+
+def _check_mill_position_tmb_loop(board: Board, field: Field, square, position_lcr):
+    fields_to_check = []
+    for position_tmb in POS_TMB_LIST:
+        coord = Coordinates(square, position_tmb, position_lcr)
+        found_field = board.field_by_positions(coord)
+        fields_to_check.append(found_field)
+    return _check_mill_condition(field, fields_to_check)
+
+
+def _check_mill_square_loop(board: Board, field: Field, position_tmb, position_lcr):
+    fields_to_check = []
+    for square in pos_sq:
+        coord = Coordinates(square, position_tmb, position_lcr)
+        found_field = board.field_by_positions(coord)
+        fields_to_check.append(found_field)
+    return _check_mill_condition(field, fields_to_check)
+
+
+def _check_mill_zip_loop(board: Board, field: Field, square, loop_list):
+    fields_to_check = []
+    for position_tmb, position_lcr in loop_list:
+        coord = Coordinates(square, position_tmb, position_lcr)
+        found_field = board.field_by_positions(coord)
+        fields_to_check.append(found_field)
+    return _check_mill_condition(field, fields_to_check)
+
+
+def _check_mill_condition(field: Field, fields_to_check: List[Field]):
+    if all([field.player() == check_field.player() for check_field in fields_to_check]):
+        return 1
+    return 0
 
 
 def remove_opponents_pawn(board: Board, player: Player) -> None:
@@ -337,9 +351,9 @@ def possible_moves(board: Board, field: Field) -> List[str]:
 
 
 def check_winner(board: Board) -> Player:
-    if board.player_pawns_number(Player.ONE) <= 2 or not check_is_any_possible_move(board, Player.ONE):
+    if board.player_pawns_number(Player.ONE) <= 2 or not is_any_possible_move(board, Player.ONE):
         winner = Player.TWO
-    elif board.player_pawns_number(Player.TWO) <= 2 or not check_is_any_possible_move(board, Player.TWO):
+    elif board.player_pawns_number(Player.TWO) <= 2 or not is_any_possible_move(board, Player.TWO):
         winner = Player.ONE
     print_winner(winner)
 

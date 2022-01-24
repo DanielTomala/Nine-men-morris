@@ -1,48 +1,48 @@
 from typing import List
-from .board import Board
-from .enums import PawnsNumber, Player, Position as pos, PositionSquare as pos_sq
 
-OTHER_PLAYER = {Player.ONE: Player.TWO,
-                Player.TWO: Player.ONE}
-PLAYER_TO_STR = {Player.ONE: "One", Player.TWO: "Two"}
-PLAYER_SYMBOL = {Player.ONE: "$", Player.TWO: "#"}
+from .board import Board
+from .consts import PLAYER_SYMBOL, PLAYER_TO_STR, POS_LCR_LIST, POS_SQ_OI_LIST, POS_TMB_LIST
+from .coordinates import Coordinates
+from .enums import PawnsNumber, Player
+from .enums import Position as pos
+from .enums import PositionSquare as pos_sq
 
 
 def print_board(board: Board):
-    print_dic_1_nine = {(pos_sq.OUTER, pos.TOP): print_outer_nine,
-                        (pos_sq.OUTER, pos.BOTTOM): print_outer_nine,
-                        (pos_sq.MIDDLE, pos.TOP): print_middle_nine,
-                        (pos_sq.MIDDLE, pos.BOTTOM): print_middle_nine,
-                        (pos_sq.INNER, pos.TOP): print_inner,
-                        (pos_sq.INNER, pos.BOTTOM): print_inner}
-    print_dic_1_twelve = {(pos_sq.OUTER, pos.TOP): print_outer_twelve_top,
-                          (pos_sq.OUTER, pos.BOTTOM): print_outer_twelve_bottom,
-                          (pos_sq.MIDDLE, pos.TOP): print_middle_twelve_top,
-                          (pos_sq.MIDDLE, pos.BOTTOM): print_middle_twelve_bottom,
-                          (pos_sq.INNER, pos.TOP): print_inner,
-                          (pos_sq.INNER, pos.BOTTOM): print_inner}
-    print_dict_1_six = {pos_sq.OUTER: print_outer_six,
-                        pos_sq.INNER: print_inner_six}
+    rows_separator_six = {pos_sq.OUTER: _print_outer_six,
+                         pos_sq.INNER: _print_inner_six}
+    rows_separator_nine = {(pos_sq.OUTER, pos.TOP): _print_outer_nine,
+                          (pos_sq.OUTER, pos.BOTTOM): _print_outer_nine,
+                          (pos_sq.MIDDLE, pos.TOP): _print_middle_nine,
+                          (pos_sq.MIDDLE, pos.BOTTOM): _print_middle_nine,
+                          (pos_sq.INNER, pos.TOP): _print_inner,
+                          (pos_sq.INNER, pos.BOTTOM): _print_inner}
+    rows_separator_twelve = {(pos_sq.OUTER, pos.TOP): _print_outer_twelve_top,
+                            (pos_sq.OUTER, pos.BOTTOM): _print_outer_twelve_bottom,
+                            (pos_sq.MIDDLE, pos.TOP): _print_middle_twelve_top,
+                            (pos_sq.MIDDLE, pos.BOTTOM): _print_middle_twelve_bottom,
+                            (pos_sq.INNER, pos.TOP): _print_inner,
+                            (pos_sq.INNER, pos.BOTTOM): _print_inner}
 
-    print_dic_2_six = {pos_sq.OUTER: {pos.LEFT: "",
-                                      pos.CENTER: 9*"-",
-                                      pos.RIGHT: 9*"-"},
-                       pos_sq.INNER: {pos.LEFT: "|" + 4*" ",
-                                      pos.CENTER: 4*"-",
-                                      pos.RIGHT: 4*"-"}}
+    columns_separator_six = {pos_sq.OUTER: {pos.LEFT: "",
+                                            pos.CENTER: 9*"-",
+                                            pos.RIGHT: 9*"-"},
+                             pos_sq.INNER: {pos.LEFT: "|" + 4*" ",
+                                            pos.CENTER: 4*"-",
+                                            pos.RIGHT: 4*"-"}}
+    columns_separator_nine = {pos_sq.OUTER: {pos.LEFT: "",
+                                             pos.CENTER: 14*"-",
+                                             pos.RIGHT: 14*"-"},
+                              pos_sq.MIDDLE: {pos.LEFT: "|" + 4*" ",
+                                              pos.CENTER:  9*"-",
+                                              pos.RIGHT: 9*"-"},
+                              pos_sq.INNER: {pos.LEFT: "|" + 4*" " + "|" + 4*" ",
+                                             pos.CENTER: 4*"-",
+                                             pos.RIGHT: 4*"-"}}
     print_dic_3_six = {pos_sq.OUTER: "",
                        pos_sq.MIDDLE: 4*" " + "|",
                        pos_sq.INNER: 4*" " + "|"}
 
-    print_dic_2 = {pos_sq.OUTER: {pos.LEFT: "",
-                                  pos.CENTER: 14*"-",
-                                  pos.RIGHT: 14*"-"},
-                   pos_sq.MIDDLE: {pos.LEFT: "|" + 4*" ",
-                                   pos.CENTER:  9*"-",
-                                   pos.RIGHT: 9*"-"},
-                   pos_sq.INNER: {pos.LEFT: "|" + 4*" " + "|" + 4*" ",
-                                  pos.CENTER: 4*"-",
-                                  pos.RIGHT: 4*"-"}}
     print_dic_3 = {pos_sq.OUTER: "",
                    pos_sq.MIDDLE: 4*" " + "|",
                    pos_sq.INNER: 2*(4*" " + "|")}
@@ -55,72 +55,71 @@ def print_board(board: Board):
                           pos.BOTTOM: ""}
 
     if board.pawns_number() == PawnsNumber.NINE:
-        print_board_nine(board, print_dic_1_nine, print_dic_2, print_dic_3)
+        _print_board_nine_or_twelve(
+            board, rows_separator_nine, columns_separator_nine, print_dic_3)
     elif board.pawns_number() == PawnsNumber.THREE:
-        print_board_three(board, print_dict_1_three, print_dict_2_three)
+        _print_board_three(board, print_dict_1_three, print_dict_2_three)
     elif board.pawns_number() == PawnsNumber.SIX:
-        print_board_six(board, print_dict_1_six,
-                        print_dic_2_six, print_dic_3_six)
+        _print_board_six(board, rows_separator_six,
+                         columns_separator_six, print_dic_3_six)
     elif board.pawns_number() == PawnsNumber.TWELVE:
-        print_board_nine(board, print_dic_1_twelve, print_dic_2, print_dic_3)
+        _print_board_nine_or_twelve(
+            board, rows_separator_twelve, columns_separator_nine, print_dic_3)
 
 
-def print_board_three(board: Board, print_dict_1_three, print_dict_2_three):
+def _print_board_three(board: Board, print_dict_1_three, print_dict_2_three):
     board_str = ""
-    for position_tmb in [pos.TOP, pos.MIDDLE, pos.BOTTOM]:
-        for position_lcr in [pos.LEFT, pos.CENTER, pos.RIGHT]:
-            field = board.field_by_positions(
-                pos_sq.MIDDLE, position_tmb, position_lcr)
-            board_str += PLAYER_SYMBOL[field.player()
-                                       ] if field.player() else "o"
+    for position_tmb in POS_TMB_LIST:
+        for position_lcr in POS_LCR_LIST:
+            coord = Coordinates(pos_sq.MIDDLE, position_tmb, position_lcr)
+            field = board.field_by_positions(coord)
+            board_str += PLAYER_SYMBOL[field.player()]
             board_str += print_dict_1_three[position_lcr]
         board_str += "\n"
         board_str += print_dict_2_three[position_tmb]
     print(board_str)
 
 
-def print_board_six(board: Board, print_dict_1_six,  print_dic_2, print_dic_3):
+def _print_board_six(board: Board, print_dict_1_six,  print_dic_2, print_dic_3):
     board_str = ""
     # TOP
-    board_str += get_top_or_bottom_part_of_board_six(board, pos.TOP, print_dict_1_six,
-                                                     print_dic_2, print_dic_3)
+    board_str += _get_top_or_bottom_part_of_board_six(board, pos.TOP, print_dict_1_six,
+                                                      print_dic_2, print_dic_3)
     # MIDDLE
-    board_str += get_middle_part_of_board_six(board)
+    board_str += _get_middle_part_of_board_six(board)
     # BOTTOM
-    board_str += get_top_or_bottom_part_of_board_six(board, pos.BOTTOM, print_dict_1_six,
-                                                     print_dic_2, print_dic_3)
+    board_str += _get_top_or_bottom_part_of_board_six(board, pos.BOTTOM, print_dict_1_six,
+                                                      print_dic_2, print_dic_3)
     print(board_str)
 
 
-def print_board_nine(board: Board, print_dic, print_dic_2, print_dic_3):
+def _print_board_nine_or_twelve(board: Board, print_dic, print_dic_2, print_dic_3):
     board_str = ""
     # TOP
-    board_str += get_top_or_bottom_part_of_board(board, pos.TOP, print_dic,
-                                                 print_dic_2, print_dic_3)
+    board_str += _get_top_or_bottom_part_of_board(board, pos.TOP, print_dic,
+                                                  print_dic_2, print_dic_3)
     # MIDDLE
-    board_str += get_middle_part_of_board(board)
+    board_str += _get_middle_part_of_board(board)
     # BOTTOM
-    board_str += get_top_or_bottom_part_of_board(board, pos.BOTTOM, print_dic,
-                                                 print_dic_2, print_dic_3)
+    board_str += _get_top_or_bottom_part_of_board(board, pos.BOTTOM, print_dic,
+                                                  print_dic_2, print_dic_3)
 
     print(board_str)
 
 
-def get_middle_part_of_board_six(board: Board):
+def _get_middle_part_of_board_six(board: Board):
     board_str = ""
     for position_square in [pos_sq.OUTER, pos_sq.INNER]:
-        field = board.field_by_positions(
-            position_square, pos.MIDDLE, pos.LEFT)
-        board_str += PLAYER_SYMBOL[field.player()
-                                   ] if field.player() else "o"
+        coord = Coordinates(position_square, pos.MIDDLE, pos.LEFT)
+        field = board.field_by_positions(coord)
+        board_str += PLAYER_SYMBOL[field.player()]
         board_str += 4 * \
             "-" if position_square == pos_sq.OUTER else ""
     board_str += 9 * " "
-    for position_square in [pos_sq.INNER, pos_sq.OUTER]:
-        field = board.field_by_positions(
-            position_square, pos.MIDDLE, pos.RIGHT)
-        board_str += PLAYER_SYMBOL[field.player()
-                                   ] if field.player() else "o"
+    for position_square in reversed(POS_SQ_OI_LIST):
+        coord = Coordinates(position_square, pos.MIDDLE, pos.RIGHT)
+        field = board.field_by_positions(coord)
+        board_str += PLAYER_SYMBOL[field.player()]
         board_str += 4 * \
             "-" if position_square == pos_sq.INNER else ""
     board_str += 9 * " "
@@ -128,21 +127,20 @@ def get_middle_part_of_board_six(board: Board):
     return board_str
 
 
-def get_top_or_bottom_part_of_board_six(board: Board, position_given, print_dic, print_dic_2, print_dic_3):
+def _get_top_or_bottom_part_of_board_six(board: Board, position_given, print_dic, print_dic_2, print_dic_3):
     board_str = ""
-    positions_list = [pos_sq.OUTER, pos_sq.INNER]
+    positions_list = POS_SQ_OI_LIST
     if position_given == pos.BOTTOM:
         positions_list.reverse()
     for position_square in positions_list:
         if position_given == pos.BOTTOM:
             board_str += print_dic[position_square]()
             board_str += "\n"
-        for position in [pos.LEFT, pos.CENTER, pos.RIGHT]:
-            field = board.field_by_positions(
-                position_square, position_given, position)
+        for position in POS_LCR_LIST:
+            coord = Coordinates(position_square, position_given, position)
+            field = board.field_by_positions(coord)
             board_str += print_dic_2[position_square][position]
-            board_str += PLAYER_SYMBOL[field.player()
-                                       ] if field.player() else "o"
+            board_str += PLAYER_SYMBOL[field.player()]
         board_str += print_dic_3[position_square]
         board_str += "\n"
         if position_given == pos.TOP:
@@ -151,24 +149,20 @@ def get_top_or_bottom_part_of_board_six(board: Board, position_given, print_dic,
     return board_str
 
 
-def get_middle_part_of_board(board: Board):
+def _get_middle_part_of_board(board: Board):
     board_str = ""
     for position_square in pos_sq:
-        field = board.field_by_positions(
-            position_square, pos.MIDDLE, pos.LEFT)
-        # board_str += field.id()
-        board_str += PLAYER_SYMBOL[field.player()
-                                   ] if field.player() else "o"
+        coord = Coordinates(position_square, pos.MIDDLE, pos.LEFT)
+        field = board.field_by_positions(coord)
+        board_str += PLAYER_SYMBOL[field.player()]
         board_str += 4 * \
             "-" if position_square in [pos_sq.OUTER,
                                        pos_sq.MIDDLE] else ""
     board_str += 9 * " "
     for position_square in reversed(pos_sq):
-        field = board.field_by_positions(
-            position_square, pos.MIDDLE, pos.RIGHT)
-        # board_str += field.id()
-        board_str += PLAYER_SYMBOL[field.player()
-                                   ] if field.player() else "o"
+        coord = Coordinates(position_square, pos.MIDDLE, pos.RIGHT)
+        field = board.field_by_positions(coord)
+        board_str += PLAYER_SYMBOL[field.player()]
         board_str += 4 * \
             "-" if position_square in [pos_sq.INNER,
                                        pos_sq.MIDDLE] else ""
@@ -177,7 +171,7 @@ def get_middle_part_of_board(board: Board):
     return board_str
 
 
-def get_top_or_bottom_part_of_board(board: Board, position_given, print_dic, print_dic_2, print_dic_3):
+def _get_top_or_bottom_part_of_board(board: Board, position_given, print_dic, print_dic_2, print_dic_3):
     board_str = ""
     positions_list = [pos_sq.OUTER, pos_sq.MIDDLE, pos_sq.INNER]
     if position_given == pos.BOTTOM:
@@ -186,14 +180,11 @@ def get_top_or_bottom_part_of_board(board: Board, position_given, print_dic, pri
         if position_given == pos.BOTTOM:
             board_str += print_dic[(position_square, position_given)]()
             board_str += "\n"
-        for position in [pos.LEFT, pos.CENTER, pos.RIGHT]:
-            field = board.field_by_positions(
-                position_square, position_given, position)
-            # Print will difer if field will be empty or there will be different pawns
+        for position in POS_LCR_LIST:
+            coord = Coordinates(position_square, position_given, position)
+            field = board.field_by_positions(coord)
             board_str += print_dic_2[position_square][position]
-            # board_str += field.id()
-            board_str += PLAYER_SYMBOL[field.player()
-                                       ] if field.player() else "o"
+            board_str += PLAYER_SYMBOL[field.player()]
         board_str += print_dic_3[position_square]
         board_str += "\n"
         if position_given == pos.TOP:
@@ -202,39 +193,39 @@ def get_top_or_bottom_part_of_board(board: Board, position_given, print_dic, pri
     return board_str
 
 
-def print_outer_nine():
+def _print_outer_nine():
     return"|              |              |"
 
 
-def print_outer_six():
+def _print_outer_six():
     return"|         |         |"
 
 
-def print_outer_twelve_top():
+def _print_outer_twelve_top():
     return"| \\            |            / |"
 
 
-def print_outer_twelve_bottom():
+def _print_outer_twelve_bottom():
     return"| /            |            \\ |"
 
 
-def print_middle_nine():
+def _print_middle_nine():
     return"|    |         |         |    |"
 
 
-def print_middle_twelve_top():
+def _print_middle_twelve_top():
     return"|    | \\       |       / |    |"
 
 
-def print_middle_twelve_bottom():
+def _print_middle_twelve_bottom():
     return"|    | /       |       \\ |    |"
 
 
-def print_inner_six():
+def _print_inner_six():
     return "|    |         |    |"
 
 
-def print_inner():
+def _print_inner():
     return"|    |    |         |    |    |"
 
 
@@ -252,11 +243,11 @@ def print_starting_player(player):
 def print_before_move(player):
     # Dodać możliwość podania nazw graczy przed rozgrywką
     # Paski na długość tekstu
-    print("\t\t-------------------------")
+    print("\t\t-----------------")
     print(f"\t\tPlayer's {PLAYER_TO_STR[player].capitalize()} turn")
     # TODO
     print(f"\t\tYour symbol is {PLAYER_SYMBOL[player]}")
-    print("\t\t-------------------------")
+    print("\t\t----------------- ")
     print_blank_lines(1)
 
 

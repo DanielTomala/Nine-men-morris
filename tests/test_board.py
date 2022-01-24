@@ -1,3 +1,4 @@
+from ..source.coordinates import Coordinates
 from ..source.enums import Player, Position, PositionSquare
 from ..source.board import Board, FIELD_IDS
 
@@ -74,9 +75,21 @@ def test_players_pawns_number():
 
 def test_field_by_positions():
     board = Board()
-    field = board.field_by_positions(
-        PositionSquare.OUTER, Position.TOP, Position.LEFT)
+    coord = Coordinates(PositionSquare.OUTER, Position.TOP, Position.LEFT)
+    field = board.field_by_positions(coord)
     assert field == board.fields()[0]
+
+
+def test_field_by_id():
+    board = Board()
+    field_1 = board.field_by_id("A")
+    field_2 = board.field_by_id("Z")
+    field_3 = board.field_by_id("L")
+    field_4 = board.field_by_id("T")
+    assert field_1 == board.fields()[0]
+    assert field_2 == board.fields()[-1]
+    assert field_3 == board.fields()[11]
+    assert field_4 == board.fields()[18]
 
 
 def test_create_nine_pawns_board():
@@ -116,19 +129,6 @@ def test_create_nine_pawns_board():
     ).position_top_middle_bottom() == Position.BOTTOM
     assert board_fields[18].coordiantes(
     ).position_left_center_right() == Position.LEFT
-
-
-def test_field_by_id():
-    board = Board()
-    field_1 = board.field_by_id("A")
-    field_2 = board.field_by_id("Z")
-    field_3 = board.field_by_id("L")
-    field_4 = board.field_by_id("T")
-    assert field_1 == board.fields()[0]
-    assert field_2 == board.fields()[-1]
-    assert field_3 == board.fields()[11]
-    assert field_4 == board.fields()[18]
-
 
 
 def test_is_field_free():
