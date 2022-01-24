@@ -1,13 +1,16 @@
 import argparse
+
+from source.consts import BOT_HELP, DELAY_HELP, PAWNS_NUMBER_HELP
+
 from source.game_logic import main
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-pn", "--pawns-number",
-                        help="Pawns number for each player in the game", choices=["9", "3", "6", "12"], default="9")
+                        help=PAWNS_NUMBER_HELP, choices=["9", "3", "6", "12"], default="9")
     parser.add_argument(
-        "-b", "--bot", help="Turns on bot and sets it's difficulty level", choices=["e", "easy", "h", "hard"], default=False)
+        "-b", "--bot", help=BOT_HELP, choices=["e", "easy", "h", "hard"], default=False)
     parser.add_argument(
-        "-d", "--delay", help="Set delay between your and bot moves for better comfort in gameplay", type=int, default=0)
+        "-d", "--delay", help=DELAY_HELP, type=int, default=0)
     args = parser.parse_args()
     main(args)

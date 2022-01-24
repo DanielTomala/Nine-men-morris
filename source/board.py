@@ -1,9 +1,8 @@
 from typing import List
 
-from pyrsistent import field
-
-from .consts import CONNECTIONS_NINE, CONNECTIONS_SIX, CONNECTIONS_THREE, CONNECTIONS_TWELVE, FIELD_IDS, POS_LCR_LIST, POS_SQ_OI_LIST, POS_TMB_LIST
-
+from .consts import (CONNECTIONS_NINE, CONNECTIONS_SIX, CONNECTIONS_THREE,
+                     CONNECTIONS_TWELVE, FIELD_IDS, POS_LCR_LIST,
+                     POS_SQ_OI_LIST, POS_TMB_LIST)
 from .coordinates import Coordinates
 from .enums import BotLvl, PawnsNumber, Player
 from .enums import Position as pos
@@ -19,6 +18,7 @@ class Board:
         self._starting_player = None
         self._bot = bot
         self._delay = delay
+        self._moves_without_mill = 0
 
     def fields(self) -> List[Field]:
         return self._fields
@@ -31,6 +31,15 @@ class Board:
 
     def delay(self) -> int:
         return self._delay
+
+    def moves_without_mill(self):
+        return self._moves_without_mill
+
+    def add_one_move_without_mill(self):
+        self._moves_without_mill += 1
+
+    def reset_moves_without_mill(self):
+        self._moves_without_mill = 0
 
     def starting_player(self) -> Player:
         return self._starting_player
@@ -225,93 +234,3 @@ class Board:
 
         for field_id, connections in zip(CONNECTIONS_TWELVE.keys(), CONNECTIONS_TWELVE.values()):
             self.field_by_id(field_id).set_connections(connections)
-
-# Może by to wczytać z pliku
-
-    # A---B---C
-    # | ⟍ | ⟋ |
-    # D---E---F
-    # | ⟋ | ⟍ |
-    # G---H---I
-
-    # A---------B---------C
-    # |         |         |
-    # |    D----E----F    |
-    # |    |         |    |
-    # G----H         I----J
-    # |    |         |    |
-    # |    K----L----M    |
-    # |         |         |
-    # N---------O---------P
-
-    # A--------------B--------------C
-    # | \            |           /  |
-    # |    D---------E---------F    |
-    # |    | \       |      /  |    |
-    # |    |    G----H----I    |    |
-    # |    |    |         |    |    |
-    # J----K----L         M----N----O
-    # |    |    |         |    |    |
-    # |    |    P----R----S    |    |
-    # |    | /       |       \ |    |
-    # |    T---------U---------W    |
-    # | /            |            \ |
-    # X--------------Y--------------Z
-
-    # A--------------B--------------C
-    # |              |              |
-    # |    D---------E---------F    |
-    # |    |         |         |    |
-    # |    |    G----H----I    |    |
-    # |    |    |         |    |    |
-    # J----K----L         M----N----O
-    # |    |    |         |    |    |
-    # |    |    P----R----S    |    |
-    # |    |         |         |    |
-    # |    T---------U---------W    |
-    # |              |              |
-    # X--------------Y--------------Z
-
-    # o--------------o--------------o
-    # |              |              |
-    # |    o---------o---------o    |
-    # |    |         |         |    |
-    # |    |    o----o----o    |    |
-    # |    |    |         |    |    |
-    # o----o----o         o----o----o
-    # |    |    |         |    |    |
-    # |    |    o----o----o    |    |
-    # |    |         |         |    |
-    # |    o---------o---------o    |
-    # |              |              |
-    # o--------------o--------------o
-
-    # o---o---o
-    # | ⟍ | ⟋ |
-    # o---o---o
-    # | ⟋ | ⟍ |
-    # o---o---o
-
-    # o---------o---------o
-    # |         |         |
-    # |    o----o----o    |
-    # |    |         |    |
-    # o----o         o----o
-    # |    |         |    |
-    # |    o----o----o    |
-    # |         |         |
-    # o---------o---------o
-
-    # o--------------o--------------o
-    # | \            |           /  |
-    # |    o---------o---------o    |
-    # |    | \       |      /  |    |
-    # |    |    o----o----o    |    |
-    # |    |    |         |    |    |
-    # o----o----o         o----o----o
-    # |    |    |         |    |    |
-    # |    |    o----o----o    |    |
-    # |    | /       |       \ |    |
-    # |    o---------o---------o    |
-    # | /            |            \ |
-    # o--------------o--------------o

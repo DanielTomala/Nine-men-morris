@@ -19,6 +19,7 @@ def print_board(board: Board):
         else:
             board_to_print += char
     print(board_to_print)
+    print_blank_lines(1)
 
 
 def get_path_to_file(pawns_number: PawnsNumber):
@@ -43,6 +44,10 @@ def print_welcome():
     print("\t\t-------------------------")
 
 
+def print_instruction():
+    pass
+
+
 def print_starting_player(player):
     print(f"Player {PLAYER_TO_STR[player]} will start the game")
     print_blank_lines(1)
@@ -53,7 +58,6 @@ def print_before_move(player):
     # Paski na długość tekstu
     print("\t\t-----------------")
     print(f"\t\tPlayer's {PLAYER_TO_STR[player].capitalize()} turn")
-    # TODO
     print(f"\t\tYour symbol is {PLAYER_SYMBOL[player]}")
     print("\t\t----------------- ")
     print_blank_lines(1)
@@ -80,18 +84,30 @@ def print_pawns_left(board: Board, player: Player, pawns_in_hand):
 
 def print_last_set(field_id):
     print(f"Last pawn was set at field {field_id}")
+    print_blank_lines(1)
 
 
 def print_last_move(old_field_id, new_field_id):
     print(f"Last move was from field {old_field_id} to {new_field_id}")
+    print_blank_lines(1)
 
 
 def print_last_remove(field_id):
     print(f"Last pawn was removed from field {field_id}")
+    print_blank_lines(1)
 
 
 def print_possible_moves(fields: List[str]):
     print(f"You can move to fields with id's: {fields}")
+
+
+def print_cancel_move():
+    print("If you want to cancel this move and choose another field enter: `")
+    print_blank_lines(1)
+
+
+def print_move_canceled():
+    print("Move canceled")
     print_blank_lines(1)
 
 
@@ -115,8 +131,22 @@ def print_no_pawn():
 
 
 def print_not_your_pawn():
-    print("This pawn doesn't belong to you. Try again")
+    print("This pawn doesn't belong to you. Try again.")
     print_blank_lines(1)
+
+
+def print_remove_own_pawn():
+    print("You cannot remove your own pawn. Try again.")
+    print_blank_lines(1)
+
+
+def print_no_possible_move():
+    print("There is no possible move with this pawn")
+    print_blank_lines(1)
+
+
+def print_no_connection():
+    print("There is no connection beetween these fields")
 
 
 def print_mill_occurred(mill_num: int):
@@ -135,29 +165,18 @@ def print_transition_to_moving_phase():
     print_blank_lines(1)
 
 
-def print_remove_own_pawn():
-    print("You cannot remove your own pawn")
-    print_blank_lines(1)
-
-
-def print_instruction():
-    pass
-
-
-def print_choose_pawns_number():
-    print("You can choose from four modes of mill game.")
-    print("Each player can have:")
-    print("[1] Nine pawns (classic mode),")
-    print("[2] Three pawns,")
-    print("[3] Six pawns,")
-    print("[4] Twelve pawns.")
-
-
-def print_choose_against_who():
-    print("You can also choose against who do you want to play:")
-    print("[1] One player against bot")
-    print("[2] Two players against each other")
+def print_game_over():
+    print("GAME OVER!")
 
 
 def print_winner(winner):
-    print(f"The Winner is player {PLAYER_TO_STR[winner]}")
+    print(
+        f"The Winner is player {PLAYER_TO_STR[winner]} ({PLAYER_SYMBOL[winner]})")
+
+
+def print_draw():
+    print("No one won, it's draw")
+
+
+def get_user_input(message):
+    return input(message)
